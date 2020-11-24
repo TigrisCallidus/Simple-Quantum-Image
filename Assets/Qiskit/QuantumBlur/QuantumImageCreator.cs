@@ -90,7 +90,7 @@ namespace QuantumImage {
         /// <param name="imageData">The data (of the image) as a 2d double array. For image data floats is more than sufficient!</param>
         /// <param name="useLog">If logarithmic encoding is chosen DOES NOTHING (at the moment)</param>
         /// <returns></returns>
-        public static QuantumCircuit GetCircuitDirect(float[,] imageData, bool useLog = false) {
+        public static QuantumCircuitFloat GetCircuitDirect(float[,] imageData, bool useLog = false) {
             return QuantumImageHelper.HeightToCircuit(imageData);
         }
 

@@ -41,7 +41,7 @@ namespace Qiskit {
         }
 
 
-        public virtual void SilumateInPlace(QuantumCircuit circuit, ref ComplexNumber[] amplitudes) {
+        public virtual void SimulateInPlace(QuantumCircuit circuit, ref ComplexNumber[] amplitudes) {
             int length = circuit.AmplitudeLength;
             if (amplitudes == null || amplitudes.Length != length) {
                 //Post message

@@ -20,6 +20,7 @@ using UnityEngine.UI;
 using QuantumImage;
 using Qiskit;
 using System.Collections.Generic;
+using Qiskit.Float;
 
 public class ImageCreation : MonoBehaviour {
 
@@ -41,8 +42,11 @@ public class ImageCreation : MonoBehaviour {
     [Tooltip("Value between 0 and 1. Showing how much Image Texture 1 and 2 should be mixed. 0 = Texture 1 and 1 = Texture 2")]
     public float TeleportPercentage = 0.5f;
 
-    [Tooltip("How big the Blocks are used for Teleportation. Default Value 8. You can change it to Powers of 2 like \"2,4,16,32\" etc. The higher the block size, the slower the teleportation")]
-    public int BlockSize = 8;
+
+    //[Tooltip("Which kind of teleportation should be used. Normal is colored and precise, grey is only black and white, fast is faster but may be a bit imprecise")]
+    //public TeleportationMode UsedTeleportationMode = ImageCreation.TeleportationMode.Normal;
+
+    //TeleportationMode UsedTeleportationMode = ImageCreation.TeleportationMode.Normal;
 
     /*
     [Tooltip("ONLY FOR TELEPORTATION. If logarithmic encoding (and decoding) is used for representing the image. This makes subtle changes be shown as less subtle")]
@@ -58,7 +62,8 @@ public class ImageCreation : MonoBehaviour {
     public string FileName = "Teleport1";
 
     [Tooltip("The new image created by Blur or by Teleportation.")]
-    Texture2D OutputTexture;
+    [HideInInspector]
+    public Texture2D OutputTexture;
 
     [Tooltip("The image manipulation which will be applied.")]
     public List<Gate> BlurCircuit;
@@ -76,7 +81,39 @@ public class ImageCreation : MonoBehaviour {
     public RawImage OutputImage;
 
 
+    /*
+    private IEnumerator Start() {
+        Application.targetFrameRate = 30;
 
+        yield return null;
+
+        OutputTexture = TeleportTexturesColoredPartByPart(InputTexture1, InputTexture2, TeleportPercentage);
+
+        OutputImage.texture = OutputTexture;
+
+        yield return null;
+        yield return null;
+        yield return null;
+        yield return null;
+        yield return null;
+
+        OutputTexture = TeleportTexturesColoredPartByPartFloat(InputTexture1, InputTexture2, TeleportPercentage);
+
+        OutputImage.texture = OutputTexture;
+
+
+        yield return null;
+        yield return null;
+        yield return null;
+        yield return null;
+        yield return null;
+
+        OutputTexture = TeleportTexturesColoredPartByPartOptimized(InputTexture1, InputTexture2, TeleportPercentage);
+
+        OutputImage.texture = OutputTexture;
+
+    }
+    */
 
     /// <summary>
     /// Creating a blurred image of the Input Texture and safe it to the Output Texture.
@@ -217,7 +254,22 @@ public class ImageCreation : MonoBehaviour {
 
         InputImage.texture = InputTexture1;
         InputImage2.texture = InputTexture2;
-        OutputTexture = TeleportTexturesColoredPartByPart(InputTexture1, InputTexture2, TeleportPercentage);
+        OutputTexture = TeleportTexturesColoredPartByPartOptimized(InputTexture1, InputTexture2, TeleportPercentage);
+/*
+        switch (UsedTeleportationMode) {
+            case TeleportationMode.Normal:
+                OutputTexture = TeleportTexturesColoredPartByPart(InputTexture1, InputTexture2, TeleportPercentage);
+                break;
+            case TeleportationMode.Grey:
+                OutputTexture = TeleportTexturesBlackWhitePartByPart(InputTexture1, InputTexture2, TeleportPercentage);
+                break;
+            case TeleportationMode.Fast:
+                OutputTexture = TeleportTexturesColoredPartByPartOptimized(InputTexture1, InputTexture2, TeleportPercentage);
+                break;
+            default:
+                break;
+        }
+*/
         OutputImage.texture = OutputTexture;
 
     }
@@ -247,12 +299,74 @@ public class ImageCreation : MonoBehaviour {
         return returnValue;
     }
 
+
+    public static QuantumCircuitFloat Combine(QuantumCircuitFloat circuit1, QuantumCircuitFloat circuit2) {
+        QuantumCircuitFloat returnValue = new QuantumCircuitFloat(circuit1.NumberOfQubits + circuit2.NumberOfQubits, circuit1.NumberOfOutputs + circuit2.NumberOfOutputs, true);
+        returnValue.OriginalSum = circuit1.OriginalSum;// * circuit2.OriginalSum;
+        int count = 0;
+        for (int i = 0; i < circuit1.AmplitudeLength; i++) {
+            for (int j = 0; j < circuit2.AmplitudeLength; j++) {
+                returnValue.Amplitudes[count].Real = circuit1.Amplitudes[i].Real * circuit2.Amplitudes[j].Real;
+                count++;
+            }
+        }
+        return returnValue;
+    }
+
+    public static void CombineInPlace(QuantumCircuit circuit1, QuantumCircuit circuit2, QuantumCircuit combined) {
+        if (combined.NumberOfQubits != circuit1.NumberOfQubits + circuit2.NumberOfQubits) {
+            Debug.LogError("wrong number of qubits! " + combined.NumberOfQubits + " vs  " + circuit1.NumberOfQubits + " " + circuit2.NumberOfQubits);
+        }
+        combined.OriginalSum = circuit1.OriginalSum;// * circuit2.OriginalSum;
+        int count = 0;
+        for (int i = 0; i < circuit1.AmplitudeLength; i++) {
+            for (int j = 0; j < circuit2.AmplitudeLength; j++) {
+                combined.Amplitudes[count].Real = circuit1.Amplitudes[i].Real * circuit2.Amplitudes[j].Real;
+                count++;
+            }
+        }
+    }
+
+    public static void CombineInPlace(QuantumCircuitFloat circuit1, QuantumCircuitFloat circuit2, QuantumCircuitFloat combined) {
+        if (combined.NumberOfQubits != circuit1.NumberOfQubits + circuit2.NumberOfQubits) {
+            Debug.LogError("wrong number of qubits! " + combined.NumberOfQubits + " vs  " + circuit1.NumberOfQubits + " " + circuit2.NumberOfQubits);
+        }
+        combined.OriginalSum = circuit1.OriginalSum;// * circuit2.OriginalSum;
+        int count = 0;
+        for (int i = 0; i < circuit1.AmplitudeLength; i++) {
+            for (int j = 0; j < circuit2.AmplitudeLength; j++) {
+                combined.Amplitudes[count].Real = circuit1.Amplitudes[i].Real * circuit2.Amplitudes[j].Real;
+                count++;
+            }
+        }
+    }
+
     public static void ApplyTeleport(QuantumCircuit circuit, double fraction) {
         int halfQubits = circuit.NumberOfQubits / 2;
         for (int i = 0; i < halfQubits; i++) {
             circuit.CX(i + halfQubits, i);
             circuit.CRX(i, i + halfQubits, fraction * MathHelper.Pi);
             circuit.CX(i + halfQubits, i);
+        }
+    }
+
+    public static void ApplyTeleport(QuantumCircuitFloat circuit, float fraction) {
+        circuit.Gates.Clear();
+        int halfQubits = circuit.NumberOfQubits / 2;
+        for (int i = 0; i < halfQubits; i++) {
+            circuit.CX(i + halfQubits, i);
+            circuit.CRX(i, i + halfQubits, fraction * MathHelper.PiFloat);
+            circuit.CX(i + halfQubits, i);
+        }
+    }
+
+    public static void ApplyTeleportApprox(QuantumCircuitFloat circuit, float fraction) {
+        circuit.Gates.Clear();
+        int halfQubits = circuit.NumberOfQubits / 2;
+        for (int i = 0; i < halfQubits; i++) {
+            //circuit.CX(i + halfQubits, i);
+            circuit.CRX(i, i + halfQubits, fraction * MathHelper.PiFloat);
+            //circuit.CX(i + halfQubits, i);
         }
     }
 
@@ -277,12 +391,76 @@ public class ImageCreation : MonoBehaviour {
         return single;
     }
 
+    public static float[] PartialTrace(QuantumCircuitFloat combined, float normalization = 1) {
+        int halfQubits = combined.NumberOfQubits / 2;
+        int amplitudeLength = MathHelper.IntegerPower(2, halfQubits);
+        MicroQiskitSimulatorFloat simulator = new MicroQiskitSimulatorFloat();
+        combined.Amplitudes = simulator.Simulate(combined);
+        float[] single = new float[amplitudeLength];
 
+        int pos = 0;
+
+        for (int i = 0; i < amplitudeLength; i++) {
+            for (int j = 0; j < amplitudeLength; j++) {
+                single[i] += combined.Amplitudes[pos].Real * combined.Amplitudes[pos].Real + combined.Amplitudes[pos].Complex * combined.Amplitudes[pos].Complex;
+                pos++;
+            }
+            single[i] *= normalization;
+            //single[i] *= combined.OriginalSum;
+        }
+
+        return single;
+    }
+
+    public static void CalculatePartialTraceInPlace(QuantumCircuit combined, double[] trace, ref ComplexNumber[] amplitudes, double normalization = 1) {
+        int halfQubits = combined.NumberOfQubits / 2;
+        //int amplitudeLength = MathHelper.IntegerPower(2, halfQubits);
+        int amplitudeLength = MathHelper.IntegerPower2(halfQubits);
+        MicroQiskitSimulator simulator = new MicroQiskitSimulator();
+        //combined.Amplitudes = simulator.SimulateInPlace(combined,ref amplitudes );
+        simulator.SimulateInPlace(combined, ref amplitudes);
+        //float[] single = new float[amplitudeLength];
+
+        int pos = 0;
+
+        for (int i = 0; i < amplitudeLength; i++) {
+            trace[i] = 0;
+            for (int j = 0; j < amplitudeLength; j++) {
+                trace[i] += amplitudes[pos].Real * amplitudes[pos].Real + amplitudes[pos].Complex * amplitudes[pos].Complex;
+                pos++;
+            }
+            trace[i] *= normalization;
+        }
+    }
+
+    public static void CalculatePartialTraceInPlace(QuantumCircuitFloat combined, float[] trace, ref ComplexNumberFloat[] amplitudes, float normalization = 1) {
+        int halfQubits = combined.NumberOfQubits / 2;
+        //int amplitudeLength = MathHelper.IntegerPower(2, halfQubits);
+        int amplitudeLength = MathHelper.IntegerPower2(halfQubits);
+        MicroQiskitSimulatorFloat simulator = new MicroQiskitSimulatorFloat();
+        //combined.Amplitudes = simulator.SimulateInPlace(combined,ref amplitudes );
+        simulator.SimulateInPlace(combined, ref amplitudes);
+        //float[] single = new float[amplitudeLength];
+
+        int pos = 0;
+
+        for (int i = 0; i < amplitudeLength; i++) {
+            trace[i] = 0;
+            for (int j = 0; j < amplitudeLength; j++) {
+                trace[i] += amplitudes[pos].Real * amplitudes[pos].Real + amplitudes[pos].Complex * amplitudes[pos].Complex;
+                pos++;
+            }
+            trace[i] *= normalization;
+        }
+    }
 
 
     public Texture2D TeleportTexturesColoredPartByPart(Texture2D inputTexture, Texture2D inputTexture2, double mixture) {
-        int dimX = BlockSize;
-        int dimY = BlockSize;
+
+        Debug.Log("Teleport");
+
+        int dimX = 8;
+        int dimY = 8;
 
         int width = inputTexture.width;
         int height = inputTexture.height;
@@ -302,14 +480,14 @@ public class ImageCreation : MonoBehaviour {
 
         }
 
-        if (width % BlockSize != 0) {
-            Debug.LogWarning("Width not divisble by Block Size  sleighly cutting width (by " + width % BlockSize + ").");
-            width = width - (width % BlockSize);
+        if (width % 8 != 0) {
+            Debug.LogWarning("Width not divisble by 8 sleighly cutting width (by " + width % 8 + ").");
+            width = width - (width % 8);
         }
 
-        if (height % BlockSize != 0) {
-            Debug.LogWarning("Height not divisble by BlockSize sleighly cutting width (by " + height % BlockSize + ").");
-            height = height - (height % BlockSize);
+        if (height % 8 != 0) {
+            Debug.LogWarning("Height not divisble by 8 sleighly cutting width (by " + height % 8 + ").");
+            height = height - (height % 8);
         }
 
         int totalX = width / dimX;
@@ -356,9 +534,9 @@ public class ImageCreation : MonoBehaviour {
                     red2 = QuantumImageHelper.HeightToCircuit(redImageData2);
                 }
 
-                double redNormalization = (1 - TeleportPercentage) * red.OriginalSum + TeleportPercentage * red2.OriginalSum;
+                double redNormalization = (1 - mixture) * red.OriginalSum + mixture * red2.OriginalSum;
                 QuantumCircuit combineRed = Combine(red, red2);
-                ApplyTeleport(combineRed, TeleportPercentage);
+                ApplyTeleport(combineRed, mixture);
                 double[] redProbs = PartialTrace(combineRed, redNormalization);
 
                 if (first) {
@@ -381,9 +559,9 @@ public class ImageCreation : MonoBehaviour {
                     green2 = QuantumImageHelper.HeightToCircuit(greenImageData2);
                 }
 
-                double greenNormalisation = (1 - TeleportPercentage) * green.OriginalSum + TeleportPercentage * green2.OriginalSum;
+                double greenNormalisation = (1 - mixture) * green.OriginalSum + mixture * green2.OriginalSum;
                 QuantumCircuit combinedGreen = Combine(green, green2);
-                ApplyTeleport(combinedGreen, TeleportPercentage);
+                ApplyTeleport(combinedGreen, mixture);
                 double[] greenProbs = PartialTrace(combinedGreen, greenNormalisation);
 
                 max1 = QuantumImageHelper.FillPartialHeightArray(inputTexture, blueImageData, ColorChannel.B, startX, startY, dimX, dimY);
@@ -401,9 +579,9 @@ public class ImageCreation : MonoBehaviour {
                     blue2 = QuantumImageHelper.HeightToCircuit(blueImageData2);
                 }
 
-                double blueNormalisation = (1 - TeleportPercentage) * blue.OriginalSum + TeleportPercentage * blue2.OriginalSum;
+                double blueNormalisation = (1 - mixture) * blue.OriginalSum + mixture * blue2.OriginalSum;
                 QuantumCircuit combinedBluen = Combine(blue, blue2);
-                ApplyTeleport(combinedBluen, TeleportPercentage);
+                ApplyTeleport(combinedBluen, mixture);
                 double[] blueProbs = PartialTrace(combinedBluen, blueNormalisation);
 
                 if (UseSimpleEncoding) {
@@ -433,6 +611,584 @@ public class ImageCreation : MonoBehaviour {
         return outputTexture;
     }
 
+    //public double[] testColors;
+
+    public Texture2D TeleportTexturesColoredPartByPartOptimized(Texture2D inputTexture, Texture2D inputTexture2, double mixture, int blockSize = 8) {
+        int dimX = blockSize;
+        int dimY = blockSize;
+
+        int width = inputTexture.width;
+        int height = inputTexture.height;
+
+        if (inputTexture2.width < inputTexture.width || inputTexture2.height < inputTexture.height) {
+            if (inputTexture2.width > inputTexture.width || inputTexture2.height > inputTexture.height) {
+                Debug.LogError("Can't find matching dimension.");
+                return new Texture2D(width, height);
+            } else {
+                Debug.LogWarning("Inputtexture 1 is too big only part of it will be used");
+                width = inputTexture2.width;
+                height = inputTexture2.height;
+            }
+
+        } else if (inputTexture2.width > inputTexture.width || inputTexture2.height > inputTexture.height) {
+            Debug.LogWarning("Inputtexture 2 is too big only part of it will be used");
+
+        }
+
+        if (width % dimX != 0) {
+            Debug.LogWarning("Width not divisble by blocksize sleighly cutting width (by " + width % dimX + ").");
+            width = width - (width % 8);
+        }
+
+        if (height % dimY != 0) {
+            Debug.LogWarning("Height not divisble by blocksize sleighly cutting width (by " + height % dimX + ").");
+            height = height - (height % 8);
+        }
+
+        int totalX = width / dimX;
+        int totalY = height / dimY;
+
+
+        int startX = 0;
+        int startY = 0;
+
+        double[,] redImageData = new double[dimX, dimY];
+        double[,] redImageData2 = new double[dimX, dimY];
+        double[,] greenImageData = new double[dimX, dimY];
+        double[,] greenImageData2 = new double[dimX, dimY];
+        double[,] blueImageData = new double[dimX, dimY];
+        double[,] blueImageData2 = new double[dimX, dimY];
+        Texture2D outputTexture = new Texture2D(width, height);
+
+        double[,] redData = new double[dimX, dimY];
+        double[,] greenData = new double[dimX, dimY];
+        double[,] blueData = new double[dimX, dimY];
+
+
+        QuantumCircuit red, green, blue;
+        QuantumCircuit red2, green2, blue2;
+        double[] redProbs, greenProbs, blueProbs;
+        ComplexNumber[] amplitudes;
+
+        int numberOfQubits = Mathf.CeilToInt(Mathf.Log(dimX) / Mathf.Log(2)) + Mathf.CeilToInt(Mathf.Log(dimY) / Mathf.Log(2));
+
+        QuantumCircuit color1 = new QuantumCircuit(numberOfQubits, numberOfQubits, true);
+        QuantumCircuit color2 = new QuantumCircuit(numberOfQubits, numberOfQubits, true);
+        QuantumCircuit combinedCircuit = new QuantumCircuit(numberOfQubits * 2, numberOfQubits * 2, true);
+
+        ApplyTeleport(combinedCircuit, mixture);
+
+        CombinationCircuit = combinedCircuit.Gates;
+
+        MathHelper.InitializePower2Values();
+
+        //int amplitudeLength = MathHelper.IntegerPower(2, numberOfQubits);
+        int amplitudeLength = MathHelper.IntegerPower2(numberOfQubits);
+
+        redProbs = new double[amplitudeLength];
+        greenProbs = new double[amplitudeLength];
+        blueProbs = new double[amplitudeLength];
+        amplitudes = new ComplexNumber[amplitudeLength];
+
+        Color32[] image1Colors = inputTexture.GetPixels32();
+        Color32[] image2Colors = inputTexture2.GetPixels32();
+
+        Color[] outColors = new Color[width* height];
+        //testColors= new double[width * height];
+
+        for (int i = 0; i < totalX; i++) {
+            for (int j = 0; j < totalY; j++) {
+                //double max1 = QuantumImageHelper.FillPartialHeightArray(inputTexture, redImageData, ColorChannel.R, startX, startY, dimX, dimY);
+                //double max2 = QuantumImageHelper.FillPartialHeightArray(inputTexture2, redImageData2, ColorChannel.R, startX, startY, dimX, dimY);
+
+                double max1 = QuantumImageHelper.FillPartialHeightArray(image1Colors, redImageData, width, ColorChannel.R, startX, startY, dimX, dimY);
+                double max2 = QuantumImageHelper.FillPartialHeightArray(image2Colors, redImageData2, width, ColorChannel.R, startX, startY, dimX, dimY);
+
+                //QuantumImageHelper.Compare(inputTexture, image1Colors, redImageData2, width, ColorChannel.R, startX, startY, dimX, dimY);
+
+                if (UseSimpleEncoding) {
+                    //red = QuantumImageHelper.ImageToCircuit(redImageData);
+                    QuantumImageHelper.FillImageToCircuit(redImageData, color1);
+                    red = color1;
+                } else {
+                    //red = QuantumImageHelper.HeightToCircuit(redImageData);
+                    QuantumImageHelper.FillHeightToCircuit(redImageData, color1);
+                    red = color1;
+                }
+
+                if (UseSimpleEncoding) {
+                    //red2 = QuantumImageHelper.ImageToCircuit(redImageData2);
+                    QuantumImageHelper.FillImageToCircuit(redImageData2, color2);
+                    red2 = color2;
+                } else {
+                    //red2 = QuantumImageHelper.HeightToCircuit(redImageData2);
+                    QuantumImageHelper.FillHeightToCircuit(redImageData2, color2);
+                    red2 = color2;
+                }
+
+                double redNormalization = (1 - mixture) * red.OriginalSum + mixture * red2.OriginalSum;
+                //QuantumCircuitFloat combineRed = Combine(red, red2);
+                CombineInPlace(red, red2, combinedCircuit);
+                //ApplyTeleport(combinedCircuit, mixture);
+
+                //redProbs = PartialTrace(combineRed, redNormalization);
+                CalculatePartialTraceInPlace(combinedCircuit, redProbs, ref amplitudes, redNormalization);
+
+
+
+                //max1 = QuantumImageHelper.FillPartialHeightArray(inputTexture, greenImageData, ColorChannel.G, startX, startY, dimX, dimY);
+                //max2 = QuantumImageHelper.FillPartialHeightArray(inputTexture2, greenImageData2, ColorChannel.G, startX, startY, dimX, dimY);
+
+                max1 = QuantumImageHelper.FillPartialHeightArray(image1Colors, greenImageData, width, ColorChannel.G, startX, startY, dimX, dimY);
+                max2 = QuantumImageHelper.FillPartialHeightArray(image2Colors, greenImageData2, width, ColorChannel.G, startX, startY, dimX, dimY);
+
+
+                if (UseSimpleEncoding) {
+                    //green = QuantumImageHelper.ImageToCircuit(greenImageData);
+                    QuantumImageHelper.FillImageToCircuit(greenImageData, color1);
+                    green = color1;
+                } else {
+                    //green = QuantumImageHelper.HeightToCircuit(greenImageData);
+                    QuantumImageHelper.FillHeightToCircuit(greenImageData, color1);
+                    green = color1;
+                }
+
+                if (UseSimpleEncoding) {
+                    //green2 = QuantumImageHelper.ImageToCircuit(greenImageData2);
+                    QuantumImageHelper.FillImageToCircuit(greenImageData2, color2);
+                    green2 = color2;
+                } else {
+                    //green2 = QuantumImageHelper.HeightToCircuit(greenImageData2);
+                    QuantumImageHelper.FillHeightToCircuit(greenImageData2, color2);
+                    green2 = color2;
+                }
+
+                double greenNormalisation = (1 - mixture) * green.OriginalSum + mixture * green2.OriginalSum;
+                //QuantumCircuitFloat combinedGreen = Combine(green, green2);
+                CombineInPlace(green, green2, combinedCircuit);
+                //ApplyTeleport(combinedCircuit, mixture);
+
+                //greenProbs = PartialTrace(combinedGreen, greenNormalisation);
+                CalculatePartialTraceInPlace(combinedCircuit, greenProbs, ref amplitudes, greenNormalisation);
+
+                //max1 = QuantumImageHelper.FillPartialHeightArray(inputTexture, blueImageData, ColorChannel.B, startX, startY, dimX, dimY);
+                //max2 = QuantumImageHelper.FillPartialHeightArray(inputTexture2, blueImageData2, ColorChannel.B, startX, startY, dimX, dimY);
+
+                max1 = QuantumImageHelper.FillPartialHeightArray(image1Colors, blueImageData, width, ColorChannel.B, startX, startY, dimX, dimY);
+                max2 = QuantumImageHelper.FillPartialHeightArray(image2Colors, blueImageData2, width, ColorChannel.B, startX, startY, dimX, dimY);
+
+
+                if (UseSimpleEncoding) {
+                    //blue = QuantumImageHelper.ImageToCircuit(blueImageData);
+                    QuantumImageHelper.FillImageToCircuit(blueImageData, color1);
+                    blue = color1;
+                } else {
+                    //blue = QuantumImageHelper.HeightToCircuit(blueImageData);
+                    QuantumImageHelper.FillHeightToCircuit(blueImageData, color1);
+                    blue = color1;
+                }
+
+                if (UseSimpleEncoding) {
+                    //blue2 = QuantumImageHelper.ImageToCircuit(blueImageData2);
+                    QuantumImageHelper.FillImageToCircuit(blueImageData2, color2);
+                    blue2 = color2;
+                } else {
+                    //blue2 = QuantumImageHelper.HeightToCircuit(blueImageData2);
+                    QuantumImageHelper.FillHeightToCircuit(blueImageData2, color2);
+                    blue2 = color2;
+                }
+
+                double blueNormalisation = (1 - mixture) * blue.OriginalSum + mixture * blue2.OriginalSum;
+                //QuantumCircuitFloat combinedBluen = Combine(blue, blue2);
+                CombineInPlace(blue, blue2, combinedCircuit);
+                //ApplyTeleport(combinedCircuit, mixture);
+
+                //blueProbs = PartialTrace(combinedBluen, blueNormalisation);
+                CalculatePartialTraceInPlace(combinedCircuit, blueProbs, ref amplitudes, blueNormalisation);
+
+                if (UseSimpleEncoding) {
+                    //redData = QuantumImageHelper.ProbabilitiesToImage(redProbs, dimX, dimY);
+                    //greenData = QuantumImageHelper.ProbabilitiesToImage(greenProbs, dimX, dimY);
+                    //blueData = QuantumImageHelper.ProbabilitiesToImage(blueProbs, dimX, dimY);
+                    QuantumImageHelper.FillProbabilitiesToImage(redProbs, dimX, dimY, redData);
+                    QuantumImageHelper.FillProbabilitiesToImage(greenProbs, dimX, dimY, greenData);
+                    QuantumImageHelper.FillProbabilitiesToImage(blueProbs, dimX, dimY, blueData);
+
+                } else {
+                    //redData = QuantumImageHelper.ProbabilitiesToHeight2D(redProbs, dimX, dimY);
+                    //greenData = QuantumImageHelper.ProbabilitiesToHeight2D(greenProbs, dimX, dimY);
+                    //blueData = QuantumImageHelper.ProbabilitiesToHeight2D(blueProbs, dimX, dimY);
+                    QuantumImageHelper.FillProbabilitiesToHeight2D(redProbs, dimX, dimY, redData);
+                    QuantumImageHelper.FillProbabilitiesToHeight2D(greenProbs, dimX, dimY, greenData);
+                    QuantumImageHelper.FillProbabilitiesToHeight2D(blueProbs, dimX, dimY, blueData);
+                }
+
+                //QuantumImageHelper.FillTextureColored(redDictionary, greenDictionary, blueDictionary, OutputTexture, startX, startY);
+                //FillTextureColored(redData, greenData, blueData, outputTexture, startX, startY);
+                FillTextureColored(redData, greenData, blueData, outColors, width, startX, startY);
+
+                startY += dimY;
+                startY = startY % width;
+
+            }
+            startX += dimX;
+        }        
+
+        outputTexture.SetPixels(outColors);
+
+        outputTexture.Apply();
+        return outputTexture;
+    }
+
+
+
+    public Texture2D TeleportTexturesColoredPartByPartFloat(Texture2D inputTexture, Texture2D inputTexture2, float mixture, int blockSize = 8) {
+        int dimX = blockSize;
+        int dimY = blockSize;
+
+        int width = inputTexture.width;
+        int height = inputTexture.height;
+
+        if (inputTexture2.width < inputTexture.width || inputTexture2.height < inputTexture.height) {
+            if (inputTexture2.width > inputTexture.width || inputTexture2.height > inputTexture.height) {
+                Debug.LogError("Can't find matching dimension.");
+                return new Texture2D(width, height);
+            } else {
+                Debug.LogWarning("Inputtexture 1 is too big only part of it will be used");
+                width = inputTexture2.width;
+                height = inputTexture2.height;
+            }
+
+        } else if (inputTexture2.width > inputTexture.width || inputTexture2.height > inputTexture.height) {
+            Debug.LogWarning("Inputtexture 2 is too big only part of it will be used");
+
+        }
+
+        if (width % dimX != 0) {
+            Debug.LogWarning("Width not divisble by blocksize sleighly cutting width (by " + width % dimX + ").");
+            width = width - (width % 8);
+        }
+
+        if (height % dimY != 0) {
+            Debug.LogWarning("Height not divisble by blocksize sleighly cutting width (by " + height % dimX + ").");
+            height = height - (height % 8);
+        }
+
+        int totalX = width / dimX;
+        int totalY = height / dimY;
+
+
+        int startX = 0;
+        int startY = 0;
+
+        float[,] redImageData = new float[dimX, dimY];
+        float[,] redImageData2 = new float[dimX, dimY];
+        float[,] greenImageData = new float[dimX, dimY];
+        float[,] greenImageData2 = new float[dimX, dimY];
+        float[,] blueImageData = new float[dimX, dimY];
+        float[,] blueImageData2 = new float[dimX, dimY];
+        Texture2D outputTexture = new Texture2D(width, height);
+
+        float[,] redData = new float[dimX, dimY];
+        float[,] greenData = new float[dimX, dimY];
+        float[,] blueData = new float[dimX, dimY];
+
+
+        QuantumCircuitFloat red, green, blue;
+        QuantumCircuitFloat red2, green2, blue2;
+        float[] redProbs, greenProbs, blueProbs;
+        ComplexNumberFloat[] amplitudes;
+        //string heightDimensions;
+
+        //bool first = true;
+
+        int numberOfQubits = Mathf.CeilToInt(Mathf.Log(dimX) / Mathf.Log(2)) + Mathf.CeilToInt(Mathf.Log(dimY) / Mathf.Log(2));
+
+        //QuantumCircuitFloat redCombined, greenCombined, blueCombined;
+        //redCombined = new QuantumCircuitFloat(numberOfQubits * 2, numberOfQubits * 2, true);
+        //greenCombined = new QuantumCircuitFloat(numberOfQubits * 2, numberOfQubits * 2, true);
+        //blueCombined = new QuantumCircuitFloat(numberOfQubits * 2, numberOfQubits * 2, true);
+
+        QuantumCircuitFloat color1 = new QuantumCircuitFloat(numberOfQubits, numberOfQubits, true);
+        QuantumCircuitFloat color2 = new QuantumCircuitFloat(numberOfQubits, numberOfQubits, true);
+        QuantumCircuitFloat combinedCircuit = new QuantumCircuitFloat(numberOfQubits * 2, numberOfQubits * 2, true);
+
+        ApplyTeleport(combinedCircuit, mixture);
+
+
+        MathHelper.InitializePower2Values(30);
+
+        //int amplitudeLength = MathHelper.IntegerPower(2, numberOfQubits);
+        int amplitudeLength = MathHelper.IntegerPower2(numberOfQubits);
+
+        redProbs = new float[amplitudeLength];
+        greenProbs = new float[amplitudeLength];
+        blueProbs = new float[amplitudeLength];
+        amplitudes = new ComplexNumberFloat[amplitudeLength];
+
+        Color32[] image1Colors = inputTexture.GetPixels32();
+        Color32[] image2Colors = inputTexture2.GetPixels32();
+
+        Color[] outColors = new Color[width * height];
+
+
+        for (int i = 0; i < totalX; i++) {
+            for (int j = 0; j < totalY; j++) {
+                //float max1 = QuantumImageHelper.FillPartialHeightArray(inputTexture, redImageData, ColorChannel.R, startX, startY, dimX, dimY);
+                //float max2 = QuantumImageHelper.FillPartialHeightArray(inputTexture2, redImageData2, ColorChannel.R, startX, startY, dimX, dimY);
+
+                double max1 = QuantumImageHelper.FillPartialHeightArray(image1Colors, redImageData, width, ColorChannel.R, startX, startY, dimX, dimY);
+                double max2 = QuantumImageHelper.FillPartialHeightArray(image2Colors, redImageData2, width, ColorChannel.R, startX, startY, dimX, dimY);
+
+
+                if (UseSimpleEncoding) {
+                    //red = QuantumImageHelper.ImageToCircuit(redImageData);
+                    QuantumImageHelper.FillImageToCircuit(redImageData, color1);
+                    red = color1;
+                } else {
+                    //red = QuantumImageHelper.HeightToCircuit(redImageData);
+                    QuantumImageHelper.FillHeightToCircuit(redImageData, color1);
+                    red = color1;
+                }
+
+                if (UseSimpleEncoding) {
+                    //red2 = QuantumImageHelper.ImageToCircuit(redImageData2);
+                    QuantumImageHelper.FillImageToCircuit(redImageData2, color2);
+                    red2 = color2;
+                } else {
+                    //red2 = QuantumImageHelper.HeightToCircuit(redImageData2);
+                    QuantumImageHelper.FillHeightToCircuit(redImageData2, color2);
+                    red2 = color2;
+                }
+
+                float redNormalization = (1 - mixture) * red.OriginalSum + mixture * red2.OriginalSum;
+                //QuantumCircuitFloat combineRed = Combine(red, red2);
+                CombineInPlace(red, red2, combinedCircuit);
+                //ApplyTeleport(combinedCircuit, mixture);
+
+                //redProbs = PartialTrace(combineRed, redNormalization);
+                CalculatePartialTraceInPlace(combinedCircuit, redProbs, ref amplitudes, redNormalization);
+
+                //TODO transform gates
+                /*
+                if (first) {
+                    CombinationCircuit = combineRed.Gates;
+                    first = false;
+                }
+                */
+
+                //max1 = QuantumImageHelper.FillPartialHeightArray(inputTexture, greenImageData, ColorChannel.G, startX, startY, dimX, dimY);
+                //max2 = QuantumImageHelper.FillPartialHeightArray(inputTexture2, greenImageData2, ColorChannel.G, startX, startY, dimX, dimY);
+
+                max1 = QuantumImageHelper.FillPartialHeightArray(image1Colors, greenImageData, width, ColorChannel.G, startX, startY, dimX, dimY);
+                max2 = QuantumImageHelper.FillPartialHeightArray(image2Colors, greenImageData2, width, ColorChannel.G, startX, startY, dimX, dimY);
+
+
+                if (UseSimpleEncoding) {
+                    //green = QuantumImageHelper.ImageToCircuit(greenImageData);
+                    QuantumImageHelper.FillImageToCircuit(greenImageData, color1);
+                    green = color1;
+                } else {
+                    //green = QuantumImageHelper.HeightToCircuit(greenImageData);
+                    QuantumImageHelper.FillHeightToCircuit(greenImageData, color1);
+                    green = color1;
+                }
+
+                if (UseSimpleEncoding) {
+                    //green2 = QuantumImageHelper.ImageToCircuit(greenImageData2);
+                    QuantumImageHelper.FillImageToCircuit(greenImageData2, color2);
+                    green2 = color2;
+                } else {
+                    //green2 = QuantumImageHelper.HeightToCircuit(greenImageData2);
+                    QuantumImageHelper.FillHeightToCircuit(greenImageData2, color2);
+                    green2 = color2;
+                }
+
+                float greenNormalisation = (1 - mixture) * green.OriginalSum + mixture * green2.OriginalSum;
+                //QuantumCircuitFloat combinedGreen = Combine(green, green2);
+                CombineInPlace(green, green2, combinedCircuit);
+                //ApplyTeleport(combinedCircuit, mixture);
+
+                //greenProbs = PartialTrace(combinedGreen, greenNormalisation);
+                CalculatePartialTraceInPlace(combinedCircuit, greenProbs, ref amplitudes, greenNormalisation);
+
+                //max1 = QuantumImageHelper.FillPartialHeightArray(inputTexture, blueImageData, ColorChannel.B, startX, startY, dimX, dimY);
+                //max2 = QuantumImageHelper.FillPartialHeightArray(inputTexture2, blueImageData2, ColorChannel.B, startX, startY, dimX, dimY);
+
+                max1 = QuantumImageHelper.FillPartialHeightArray(image1Colors, blueImageData, width, ColorChannel.B, startX, startY, dimX, dimY);
+                max2 = QuantumImageHelper.FillPartialHeightArray(image2Colors, blueImageData2, width, ColorChannel.B, startX, startY, dimX, dimY);
+
+
+                if (UseSimpleEncoding) {
+                    //blue = QuantumImageHelper.ImageToCircuit(blueImageData);
+                    QuantumImageHelper.FillImageToCircuit(blueImageData, color1);
+                    blue = color1;
+                } else {
+                    //blue = QuantumImageHelper.HeightToCircuit(blueImageData);
+                    QuantumImageHelper.FillHeightToCircuit(blueImageData, color1);
+                    blue = color1;
+                }
+
+                if (UseSimpleEncoding) {
+                    //blue2 = QuantumImageHelper.ImageToCircuit(blueImageData2);
+                    QuantumImageHelper.FillImageToCircuit(blueImageData2, color2);
+                    blue2 = color2;
+                } else {
+                    //blue2 = QuantumImageHelper.HeightToCircuit(blueImageData2);
+                    QuantumImageHelper.FillHeightToCircuit(blueImageData2, color2);
+                    blue2 = color2;
+                }
+
+                float blueNormalisation = (1 - mixture) * blue.OriginalSum + mixture * blue2.OriginalSum;
+                //QuantumCircuitFloat combinedBluen = Combine(blue, blue2);
+                CombineInPlace(blue, blue2, combinedCircuit);
+                //ApplyTeleport(combinedCircuit, mixture);
+
+                //blueProbs = PartialTrace(combinedBluen, blueNormalisation);
+                CalculatePartialTraceInPlace(combinedCircuit, blueProbs, ref amplitudes, blueNormalisation);
+
+                if (UseSimpleEncoding) {
+                    //redData = QuantumImageHelper.ProbabilitiesToImage(redProbs, dimX, dimY);
+                    //greenData = QuantumImageHelper.ProbabilitiesToImage(greenProbs, dimX, dimY);
+                    //blueData = QuantumImageHelper.ProbabilitiesToImage(blueProbs, dimX, dimY);
+                    QuantumImageHelper.FillProbabilitiesToImage(redProbs, dimX, dimY, redData);
+                    QuantumImageHelper.FillProbabilitiesToImage(greenProbs, dimX, dimY, greenData);
+                    QuantumImageHelper.FillProbabilitiesToImage(blueProbs, dimX, dimY, blueData);
+
+                } else {
+                    //redData = QuantumImageHelper.ProbabilitiesToHeight2D(redProbs, dimX, dimY);
+                    //greenData = QuantumImageHelper.ProbabilitiesToHeight2D(greenProbs, dimX, dimY);
+                    //blueData = QuantumImageHelper.ProbabilitiesToHeight2D(blueProbs, dimX, dimY);
+                    QuantumImageHelper.FillProbabilitiesToHeight2D(redProbs, dimX, dimY, redData);
+                    QuantumImageHelper.FillProbabilitiesToHeight2D(greenProbs, dimX, dimY, greenData);
+                    QuantumImageHelper.FillProbabilitiesToHeight2D(blueProbs, dimX, dimY, blueData);
+                }
+
+                //QuantumImageHelper.FillTextureColored(redDictionary, greenDictionary, blueDictionary, OutputTexture, startX, startY);
+                //FillTextureColored(redData, greenData, blueData, outputTexture, startX, startY);
+                FillTextureColored(redData, greenData, blueData, outColors, width, startX, startY);
+
+                startY += dimY;
+                startY = startY % width;
+
+            }
+            startX += dimX;
+        }
+
+        outputTexture.SetPixels(outColors);
+
+        outputTexture.Apply();
+
+        return outputTexture;
+    }
+
+
+    public Texture2D TeleportTexturesBlackWhitePartByPart(Texture2D inputTexture, Texture2D inputTexture2, double mixture) {
+        int dimX = 8;
+        int dimY = 8;
+
+        int width = inputTexture.width;
+        int height = inputTexture.height;
+
+        if (inputTexture2.width < inputTexture.width || inputTexture2.height < inputTexture.height) {
+            if (inputTexture2.width > inputTexture.width || inputTexture2.height > inputTexture.height) {
+                Debug.LogError("Can't find matching dimension.");
+                return new Texture2D(width, height);
+            } else {
+                Debug.LogWarning("Inputtexture 1 is too big only part of it will be used");
+                width = inputTexture2.width;
+                height = inputTexture2.height;
+            }
+
+        } else if (inputTexture2.width > inputTexture.width || inputTexture2.height > inputTexture.height) {
+            Debug.LogWarning("Inputtexture 2 is too big only part of it will be used");
+
+        }
+
+        if (width % 8 != 0) {
+            Debug.LogWarning("Width not divisble by 8 sleighly cutting width (by " + width % 8 + ").");
+            width = width - (width % 8);
+        }
+
+        if (height % 8 != 0) {
+            Debug.LogWarning("Height not divisble by 8 sleighly cutting width (by " + height % 8 + ").");
+            height = height - (height % 8);
+        }
+
+        int totalX = width / dimX;
+        int totalY = height / dimY;
+
+
+        int startX = 0;
+        int startY = 0;
+
+        double[,] redImageData = new double[dimX, dimY];
+        double[,] redImageData2 = new double[dimX, dimY];
+
+        Texture2D outputTexture = new Texture2D(width, height);
+
+        double[,] redData;
+
+
+
+        QuantumCircuit red;//, green, blue;
+        QuantumCircuit red2;//, green2, blue2;
+
+        //string heightDimensions;
+
+        bool first = true;
+
+        for (int i = 0; i < totalX; i++) {
+            for (int j = 0; j < totalY; j++) {
+                double max1 = QuantumImageHelper.FillPartialHeightArray(inputTexture, redImageData, ColorChannel.R, startX, startY, dimX, dimY);
+                double max2 = QuantumImageHelper.FillPartialHeightArray(inputTexture2, redImageData2, ColorChannel.R, startX, startY, dimX, dimY);
+
+                if (UseSimpleEncoding) {
+                    red = QuantumImageHelper.ImageToCircuit(redImageData);
+                } else {
+                    red = QuantumImageHelper.HeightToCircuit(redImageData);
+                }
+
+                if (UseSimpleEncoding) {
+                    red2 = QuantumImageHelper.ImageToCircuit(redImageData2);
+                } else {
+                    red2 = QuantumImageHelper.HeightToCircuit(redImageData2);
+                }
+
+                double redNormalization = (1 - mixture) * red.OriginalSum + mixture * red2.OriginalSum;
+                QuantumCircuit combineRed = Combine(red, red2);
+                ApplyTeleport(combineRed, mixture);
+                double[] redProbs = PartialTrace(combineRed, redNormalization);
+
+                if (first) {
+                    CombinationCircuit = combineRed.Gates;
+                    first = false;
+                }
+
+
+                if (UseSimpleEncoding) {
+                    redData = QuantumImageHelper.ProbabilitiesToImage(redProbs, dimX, dimY);
+
+
+                } else {
+                    redData = QuantumImageHelper.ProbabilitiesToHeight2D(redProbs, dimX, dimY);
+
+                }
+
+                FillTextureBlackWhite(redData, outputTexture, startX, startY);
+
+                startY += dimY;
+                startY = startY % width;
+
+            }
+            startX += dimX;
+        }
+
+
+        outputTexture.Apply();
+
+        return outputTexture;
+    }
 
 
     public Texture2D CustomMixPartByPart(Texture2D inputTexture, Texture2D inputTexture2, double mixture) {
@@ -490,13 +1246,23 @@ public class ImageCreation : MonoBehaviour {
         QuantumCircuit red, green, blue;
         QuantumCircuit red2, green2, blue2;
 
+        Color32[] image1Colors = inputTexture.GetPixels32();
+        Color32[] image2Colors = inputTexture2.GetPixels32();
+
+        Color[] outColors = new Color[width * height];
+
+
         //string heightDimensions;
 
 
         for (int i = 0; i < totalX; i++) {
             for (int j = 0; j < totalY; j++) {
-                double max1 = QuantumImageHelper.FillPartialHeightArray(inputTexture, redImageData, ColorChannel.R, startX, startY, dimX, dimY);
-                double max2 = QuantumImageHelper.FillPartialHeightArray(inputTexture2, redImageData2, ColorChannel.R, startX, startY, dimX, dimY);
+                //double max1 = QuantumImageHelper.FillPartialHeightArray(inputTexture, redImageData, ColorChannel.R, startX, startY, dimX, dimY);
+                //double max2 = QuantumImageHelper.FillPartialHeightArray(inputTexture2, redImageData2, ColorChannel.R, startX, startY, dimX, dimY);
+
+                double max1 = QuantumImageHelper.FillPartialHeightArray(image1Colors, redImageData, width, ColorChannel.R, startX, startY, dimX, dimY);
+                double max2 = QuantumImageHelper.FillPartialHeightArray(image2Colors, redImageData2, width, ColorChannel.R, startX, startY, dimX, dimY);
+
 
                 if (UseSimpleEncoding) {
                     red = QuantumImageHelper.ImageToCircuit(redImageData);
@@ -517,8 +1283,13 @@ public class ImageCreation : MonoBehaviour {
                 double[] redProbs = PartialTrace(combineRed, redNormalization);
 
 
-                max1 = QuantumImageHelper.FillPartialHeightArray(inputTexture, greenImageData, ColorChannel.G, startX, startY, dimX, dimY);
-                max2 = QuantumImageHelper.FillPartialHeightArray(inputTexture2, greenImageData2, ColorChannel.G, startX, startY, dimX, dimY);
+                //max1 = QuantumImageHelper.FillPartialHeightArray(inputTexture, greenImageData, ColorChannel.G, startX, startY, dimX, dimY);
+                //max2 = QuantumImageHelper.FillPartialHeightArray(inputTexture2, greenImageData2, ColorChannel.G, startX, startY, dimX, dimY);
+
+                max1 = QuantumImageHelper.FillPartialHeightArray(image1Colors, greenImageData, width, ColorChannel.G, startX, startY, dimX, dimY);
+                max2 = QuantumImageHelper.FillPartialHeightArray(image2Colors, greenImageData2, width, ColorChannel.G, startX, startY, dimX, dimY);
+
+
 
                 if (UseSimpleEncoding) {
                     green = QuantumImageHelper.ImageToCircuit(greenImageData);
@@ -539,8 +1310,12 @@ public class ImageCreation : MonoBehaviour {
 
                 double[] greenProbs = PartialTrace(combinedGreen, greenNormalisation);
 
-                max1 = QuantumImageHelper.FillPartialHeightArray(inputTexture, blueImageData, ColorChannel.B, startX, startY, dimX, dimY);
-                max2 = QuantumImageHelper.FillPartialHeightArray(inputTexture2, blueImageData2, ColorChannel.B, startX, startY, dimX, dimY);
+                //max1 = QuantumImageHelper.FillPartialHeightArray(inputTexture, blueImageData, ColorChannel.B, startX, startY, dimX, dimY);
+                //max2 = QuantumImageHelper.FillPartialHeightArray(inputTexture2, blueImageData2, ColorChannel.B, startX, startY, dimX, dimY);
+
+                max1 = QuantumImageHelper.FillPartialHeightArray(image1Colors, blueImageData, width, ColorChannel.B, startX, startY, dimX, dimY);
+                max2 = QuantumImageHelper.FillPartialHeightArray(image2Colors, blueImageData2, width, ColorChannel.B, startX, startY, dimX, dimY);
+
 
                 if (UseSimpleEncoding) {
                     blue = QuantumImageHelper.ImageToCircuit(blueImageData);
@@ -573,7 +1348,8 @@ public class ImageCreation : MonoBehaviour {
                 }
 
                 //QuantumImageHelper.FillTextureColored(redDictionary, greenDictionary, blueDictionary, OutputTexture, startX, startY);
-                FillTextureColored(redData, greenData, blueData, outputTexture, startX, startY);
+                //FillTextureColored(redData, greenData, blueData, outputTexture, startX, startY);
+                FillTextureColored(redData, greenData, blueData, outColors, width, startX, startY);
 
                 startY += dimY;
                 startY = startY % width;
@@ -581,9 +1357,231 @@ public class ImageCreation : MonoBehaviour {
             startX += dimX;
         }
 
+        outputTexture.SetPixels(outColors);
 
         outputTexture.Apply();
 
+        return outputTexture;
+    }
+
+    public Texture2D CustomMixPartByPartOptimized(Texture2D inputTexture, Texture2D inputTexture2, double mixture, int blockSize = 8) {
+        int dimX = blockSize;
+        int dimY = blockSize;
+
+        int width = inputTexture.width;
+        int height = inputTexture.height;
+
+        if (inputTexture2.width < inputTexture.width || inputTexture2.height < inputTexture.height) {
+            if (inputTexture2.width > inputTexture.width || inputTexture2.height > inputTexture.height) {
+                Debug.LogError("Can't find matching dimension.");
+                return new Texture2D(width, height);
+            } else {
+                Debug.LogWarning("Inputtexture 1 is too big only part of it will be used");
+                width = inputTexture2.width;
+                height = inputTexture2.height;
+            }
+
+        } else if (inputTexture2.width > inputTexture.width || inputTexture2.height > inputTexture.height) {
+            Debug.LogWarning("Inputtexture 2 is too big only part of it will be used");
+
+        }
+
+        if (width % dimX != 0) {
+            Debug.LogWarning("Width not divisble by blocksize sleighly cutting width (by " + width % dimX + ").");
+            width = width - (width % 8);
+        }
+
+        if (height % dimY != 0) {
+            Debug.LogWarning("Height not divisble by blocksize sleighly cutting width (by " + height % dimX + ").");
+            height = height - (height % 8);
+        }
+
+        int totalX = width / dimX;
+        int totalY = height / dimY;
+
+
+        int startX = 0;
+        int startY = 0;
+
+        double[,] redImageData = new double[dimX, dimY];
+        double[,] redImageData2 = new double[dimX, dimY];
+        double[,] greenImageData = new double[dimX, dimY];
+        double[,] greenImageData2 = new double[dimX, dimY];
+        double[,] blueImageData = new double[dimX, dimY];
+        double[,] blueImageData2 = new double[dimX, dimY];
+        Texture2D outputTexture = new Texture2D(width, height);
+
+        double[,] redData = new double[dimX, dimY];
+        double[,] greenData = new double[dimX, dimY];
+        double[,] blueData = new double[dimX, dimY];
+
+
+        QuantumCircuit red, green, blue;
+        QuantumCircuit red2, green2, blue2;
+        double[] redProbs, greenProbs, blueProbs;
+        ComplexNumber[] amplitudes;
+
+        int numberOfQubits = Mathf.CeilToInt(Mathf.Log(dimX) / Mathf.Log(2)) + Mathf.CeilToInt(Mathf.Log(dimY) / Mathf.Log(2));
+
+        QuantumCircuit color1 = new QuantumCircuit(numberOfQubits, numberOfQubits, true);
+        QuantumCircuit color2 = new QuantumCircuit(numberOfQubits, numberOfQubits, true);
+        QuantumCircuit combinedCircuit = new QuantumCircuit(numberOfQubits * 2, numberOfQubits * 2, true);
+
+        combinedCircuit.Gates = CombinationCircuit;
+
+        MathHelper.InitializePower2Values();
+
+        //int amplitudeLength = MathHelper.IntegerPower(2, numberOfQubits);
+        int amplitudeLength = MathHelper.IntegerPower2(numberOfQubits);
+
+        redProbs = new double[amplitudeLength];
+        greenProbs = new double[amplitudeLength];
+        blueProbs = new double[amplitudeLength];
+        amplitudes = new ComplexNumber[amplitudeLength];
+
+        Color32[] image1Colors = inputTexture.GetPixels32();
+        Color32[] image2Colors = inputTexture2.GetPixels32();
+
+        Color[] outColors = new Color[width * height];
+
+
+        for (int i = 0; i < totalX; i++) {
+            for (int j = 0; j < totalY; j++) {
+                //double max1 = QuantumImageHelper.FillPartialHeightArray(inputTexture, redImageData, ColorChannel.R, startX, startY, dimX, dimY);
+                //double max2 = QuantumImageHelper.FillPartialHeightArray(inputTexture2, redImageData2, ColorChannel.R, startX, startY, dimX, dimY);
+                double max1 = QuantumImageHelper.FillPartialHeightArray(image1Colors, redImageData, width, ColorChannel.R, startX, startY, dimX, dimY);
+                double max2 = QuantumImageHelper.FillPartialHeightArray(image2Colors, redImageData2, width, ColorChannel.R, startX, startY, dimX, dimY);
+
+
+
+                if (UseSimpleEncoding) {
+                    //red = QuantumImageHelper.ImageToCircuit(redImageData);
+                    QuantumImageHelper.FillImageToCircuit(redImageData, color1);
+                    red = color1;
+                } else {
+                    //red = QuantumImageHelper.HeightToCircuit(redImageData);
+                    QuantumImageHelper.FillHeightToCircuit(redImageData, color1);
+                    red = color1;
+                }
+
+                if (UseSimpleEncoding) {
+                    //red2 = QuantumImageHelper.ImageToCircuit(redImageData2);
+                    QuantumImageHelper.FillImageToCircuit(redImageData2, color2);
+                    red2 = color2;
+                } else {
+                    //red2 = QuantumImageHelper.HeightToCircuit(redImageData2);
+                    QuantumImageHelper.FillHeightToCircuit(redImageData2, color2);
+                    red2 = color2;
+                }
+
+                double redNormalization = (1 - mixture) * red.OriginalSum + mixture * red2.OriginalSum;
+                //QuantumCircuitFloat combineRed = Combine(red, red2);
+                CombineInPlace(red, red2, combinedCircuit);
+                //ApplyTeleport(combinedCircuit, mixture);
+
+                //redProbs = PartialTrace(combineRed, redNormalization);
+                CalculatePartialTraceInPlace(combinedCircuit, redProbs, ref amplitudes, redNormalization);
+
+
+
+                //max1 = QuantumImageHelper.FillPartialHeightArray(inputTexture, greenImageData, ColorChannel.G, startX, startY, dimX, dimY);
+                //max2 = QuantumImageHelper.FillPartialHeightArray(inputTexture2, greenImageData2, ColorChannel.G, startX, startY, dimX, dimY);
+                max1 = QuantumImageHelper.FillPartialHeightArray(image1Colors, greenImageData, width, ColorChannel.G, startX, startY, dimX, dimY);
+                max2 = QuantumImageHelper.FillPartialHeightArray(image2Colors, greenImageData2, width, ColorChannel.G, startX, startY, dimX, dimY);
+
+
+                if (UseSimpleEncoding) {
+                    //green = QuantumImageHelper.ImageToCircuit(greenImageData);
+                    QuantumImageHelper.FillImageToCircuit(greenImageData, color1);
+                    green = color1;
+                } else {
+                    //green = QuantumImageHelper.HeightToCircuit(greenImageData);
+                    QuantumImageHelper.FillHeightToCircuit(greenImageData, color1);
+                    green = color1;
+                }
+
+                if (UseSimpleEncoding) {
+                    //green2 = QuantumImageHelper.ImageToCircuit(greenImageData2);
+                    QuantumImageHelper.FillImageToCircuit(greenImageData2, color2);
+                    green2 = color2;
+                } else {
+                    //green2 = QuantumImageHelper.HeightToCircuit(greenImageData2);
+                    QuantumImageHelper.FillHeightToCircuit(greenImageData2, color2);
+                    green2 = color2;
+                }
+
+                double greenNormalisation = (1 - mixture) * green.OriginalSum + mixture * green2.OriginalSum;
+                //QuantumCircuitFloat combinedGreen = Combine(green, green2);
+                CombineInPlace(green, green2, combinedCircuit);
+                //ApplyTeleport(combinedCircuit, mixture);
+
+                //greenProbs = PartialTrace(combinedGreen, greenNormalisation);
+                CalculatePartialTraceInPlace(combinedCircuit, greenProbs, ref amplitudes, greenNormalisation);
+
+                //max1 = QuantumImageHelper.FillPartialHeightArray(inputTexture, blueImageData, ColorChannel.B, startX, startY, dimX, dimY);
+                //max2 = QuantumImageHelper.FillPartialHeightArray(inputTexture2, blueImageData2, ColorChannel.B, startX, startY, dimX, dimY);
+                max1 = QuantumImageHelper.FillPartialHeightArray(image1Colors, blueImageData, width, ColorChannel.B, startX, startY, dimX, dimY);
+                max2 = QuantumImageHelper.FillPartialHeightArray(image2Colors, blueImageData2, width, ColorChannel.B, startX, startY, dimX, dimY);
+
+
+                if (UseSimpleEncoding) {
+                    //blue = QuantumImageHelper.ImageToCircuit(blueImageData);
+                    QuantumImageHelper.FillImageToCircuit(blueImageData, color1);
+                    blue = color1;
+                } else {
+                    //blue = QuantumImageHelper.HeightToCircuit(blueImageData);
+                    QuantumImageHelper.FillHeightToCircuit(blueImageData, color1);
+                    blue = color1;
+                }
+
+                if (UseSimpleEncoding) {
+                    //blue2 = QuantumImageHelper.ImageToCircuit(blueImageData2);
+                    QuantumImageHelper.FillImageToCircuit(blueImageData2, color2);
+                    blue2 = color2;
+                } else {
+                    //blue2 = QuantumImageHelper.HeightToCircuit(blueImageData2);
+                    QuantumImageHelper.FillHeightToCircuit(blueImageData2, color2);
+                    blue2 = color2;
+                }
+
+                double blueNormalisation = (1 - mixture) * blue.OriginalSum + mixture * blue2.OriginalSum;
+                //QuantumCircuitFloat combinedBluen = Combine(blue, blue2);
+                CombineInPlace(blue, blue2, combinedCircuit);
+                //ApplyTeleport(combinedCircuit, mixture);
+
+                //blueProbs = PartialTrace(combinedBluen, blueNormalisation);
+                CalculatePartialTraceInPlace(combinedCircuit, blueProbs, ref amplitudes, blueNormalisation);
+
+                if (UseSimpleEncoding) {
+                    //redData = QuantumImageHelper.ProbabilitiesToImage(redProbs, dimX, dimY);
+                    //greenData = QuantumImageHelper.ProbabilitiesToImage(greenProbs, dimX, dimY);
+                    //blueData = QuantumImageHelper.ProbabilitiesToImage(blueProbs, dimX, dimY);
+                    QuantumImageHelper.FillProbabilitiesToImage(redProbs, dimX, dimY, redData);
+                    QuantumImageHelper.FillProbabilitiesToImage(greenProbs, dimX, dimY, greenData);
+                    QuantumImageHelper.FillProbabilitiesToImage(blueProbs, dimX, dimY, blueData);
+
+                } else {
+                    //redData = QuantumImageHelper.ProbabilitiesToHeight2D(redProbs, dimX, dimY);
+                    //greenData = QuantumImageHelper.ProbabilitiesToHeight2D(greenProbs, dimX, dimY);
+                    //blueData = QuantumImageHelper.ProbabilitiesToHeight2D(blueProbs, dimX, dimY);
+                    QuantumImageHelper.FillProbabilitiesToHeight2D(redProbs, dimX, dimY, redData);
+                    QuantumImageHelper.FillProbabilitiesToHeight2D(greenProbs, dimX, dimY, greenData);
+                    QuantumImageHelper.FillProbabilitiesToHeight2D(blueProbs, dimX, dimY, blueData);
+                }
+
+                //QuantumImageHelper.FillTextureColored(redDictionary, greenDictionary, blueDictionary, OutputTexture, startX, startY);
+                //FillTextureColored(redData, greenData, blueData, outputTexture, startX, startY);
+                FillTextureColored(redData, greenData, blueData, outColors, width, startX, startY);
+
+                startY += dimY;
+                startY = startY % width;
+
+            }
+            startX += dimX;
+        }
+        outputTexture.SetPixels(outColors);
+
+        outputTexture.Apply();
         return outputTexture;
     }
 
@@ -604,12 +1602,83 @@ public class ImageCreation : MonoBehaviour {
                 textureToFill.SetPixel(i + startWidth, j + startHeight, new Color(redValue, greenValue, blueValue));
             }
         }
+    }
+
+    public static void FillTextureColored(double[,] redData, double[,] greenData, double[,] blueData, Color[] colorToFill, int maxWidth, int startWidth = 0, int startHeight = 0) {
+
+        float redValue, greenValue, blueValue;
+
+        int width = redData.GetLength(0);
+        int height = redData.GetLength(1);
+
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                redValue = (float)redData[x, y];
+                greenValue = (float)greenData[x, y];
+                blueValue = (float)blueData[x, y];
+                colorToFill[x + startWidth + (y + startHeight) * maxWidth] =  new Color(redValue, greenValue, blueValue);
+                //colorToFill.SetPixel(i + startWidth, j + startHeight, new Color(redValue, greenValue, blueValue));
+            }
+        }
+    }
+
+    //TODO fill data not 1 by 1
+    public static void FillTextureColored(float[,] redData, float[,] greenData, float[,] blueData, Texture2D textureToFill, int startWidth = 0, int startHeight = 0) {
+
+        float redValue, greenValue, blueValue;
+
+        int width = redData.GetLength(0);
+        int height = redData.GetLength(1);
+
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
+                redValue = redData[i, j];
+                greenValue = greenData[i, j];
+                blueValue = blueData[i, j];
+                textureToFill.SetPixel(i + startWidth, j + startHeight, new Color(redValue, greenValue, blueValue));
+            }
+        }
+    }
+
+    public static void FillTextureColored(float[,] redData, float[,] greenData, float[,] blueData, Color[] colorToFill, int maxWidth,  int startWidth = 0, int startHeight = 0) {
+
+        float redValue, greenValue, blueValue;
+
+        int width = redData.GetLength(0);
+        int height = redData.GetLength(1);
+
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                redValue = redData[x, y];
+                greenValue = greenData[x, y];
+                blueValue = blueData[x, y];
+                colorToFill[x + startWidth + (y + startHeight) * maxWidth] = new Color(redValue, greenValue, blueValue);
+                //colorToFill.SetPixel(i + startWidth, j + startHeight, new Color(redValue, greenValue, blueValue));
+            }
+        }
+    }
+
+    public static void FillTextureBlackWhite(double[,] imageData, Texture2D textureToFill, int startWidth = 0, int startHeight = 0) {
+
+        float colorValue;//, greenValue, blueValue;
+
+        int width = imageData.GetLength(0);
+        int height = imageData.GetLength(1);
+
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
+                colorValue = (float)imageData[i, j];
+                textureToFill.SetPixel(i + startWidth, j + startHeight, new Color(colorValue, colorValue, colorValue));
+            }
+        }
 
     }
 
-
-
-
+    public enum TeleportationMode {
+        Normal,
+        Grey,
+        Fast
+    }
 
 
     #region FileBrowser
@@ -677,6 +1746,7 @@ public class ImageCreation : MonoBehaviour {
     void onCancel() {
         Debug.Log("Request got cancelled");
     }
+
 
     #endregion
 

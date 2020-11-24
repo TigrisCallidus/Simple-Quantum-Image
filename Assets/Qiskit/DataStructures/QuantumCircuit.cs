@@ -216,12 +216,13 @@ namespace Qiskit {
 
         public void Normalize() {
             double sum = ProbabilitySum();
+            //Debug.Log(sum);
             Normalize(sum);
         }
 
         public void Normalize(double sum) {
             if (sum < MathHelper.Eps) {
-                LogError("Sum is 0");
+                LogError("Sum is 0 " + sum);
                 return;
             }
 

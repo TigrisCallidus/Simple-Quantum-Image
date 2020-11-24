@@ -43,6 +43,7 @@ namespace Qiskit.Float {
             if (initializeAmplitudes) {
                 Amplitudes = new ComplexNumberFloat[AmplitudeLength];
 
+
             }
         }
 
@@ -236,7 +237,7 @@ namespace Qiskit.Float {
         public void Normalize(float sum) {
 
             if (sum < MathHelper.EpsFloat) {
-                Debug.LogError("Sum is 0");
+                Debug.LogError("Sum is" + sum);
                 return;
             }
 
