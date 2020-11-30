@@ -755,7 +755,7 @@ namespace QuantumImage {
         }
 
 
-        public static Texture2D CalculateColorTexture(double[,] redData, double[,] greenData, double[,] blueData) {
+        public static Texture2D CalculateColorTexture(double[,] redData, double[,] greenData, double[,] blueData, float redScale = 1, float greenScale = 1, float blueScale = 1) {
             int width = redData.GetLength(0);
             int height = redData.GetLength(1);
 
@@ -770,7 +770,7 @@ namespace QuantumImage {
                     redValue = (float)redData[i, j];
                     greenValue = (float)greenData[i, j];
                     blueValue = (float)blueData[i, j];
-                    texture.SetPixel(i, j, new Color(redValue, greenValue, blueValue));
+                    texture.SetPixel(i, j, new Color(redValue*redScale, greenValue*greenScale, blueValue*blueScale));
                 }
             }
 

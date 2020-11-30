@@ -179,8 +179,10 @@ public class ImageCreation : MonoBehaviour {
     }
 
     public void ApplyGates() {
+        if (InputImage!=null) {
+            InputImage.texture = InputTexture1;
+        }
 
-        InputImage.texture = InputTexture1;
 
         //generating the quantum circuits encoding the color channels of the image
 
@@ -231,8 +233,9 @@ public class ImageCreation : MonoBehaviour {
         }
 
         OutputTexture = QuantumImageHelper.CalculateColorTexture(redData, greenData, blueData);
-
-        OutputImage.texture = OutputTexture;
+        if (OutputImage!=null) {
+            OutputImage.texture = OutputTexture;
+        }
     }
 
 
