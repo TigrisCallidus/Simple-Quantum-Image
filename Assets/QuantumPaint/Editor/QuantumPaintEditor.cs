@@ -73,6 +73,8 @@ public class QuantumPaintEditor : Editor {
 
 
         EditorGUILayout.PropertyField(size);
+        EditorGUILayout.PropertyField(color);
+
 
         EditorGUILayout.Space();
 
@@ -82,7 +84,6 @@ public class QuantumPaintEditor : Editor {
         EditorGUILayout.Space();
 
         EditorGUILayout.PropertyField(type);
-        EditorGUILayout.PropertyField(color);
         EditorGUILayout.PropertyField(strength);
         targetScript.AxisToReflect= EditorGUILayout.IntSlider("Axis to Reflect", targetScript.AxisToReflect, 1, targetScript.logSize);
 
