@@ -73,5 +73,14 @@ public class TerrainGeneratorEditor : Editor {
             targetScript.LoadSettings();
         }
 
+        if (GUILayout.Button("Export settings to json")) {
+            targetScript.ExportSettingsFile();
+            AssetDatabase.Refresh();
+        }
+
+        if (GUILayout.Button("Import settings from json")) {
+            targetScript.ImportSettingsFile();
+        }
+
     }
 }

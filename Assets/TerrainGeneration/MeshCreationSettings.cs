@@ -31,3 +31,16 @@ public class MeshCreationSettings : ScriptableObject
     public float ColorScaling = 1;
     public TerrainGenerator.VisualitationType VisualisationMethod;
 }
+
+[System.Serializable]
+public class MeshCreationExportSettings {
+    public float BlurRotation = 0.25f;
+    public int MaxHeight = 10;
+    public bool Invert;
+    public float Threshold = 0.5f;
+    public Gradient HeighGradient;
+    public bool AlwaysDrawBottomCube = true;
+    public float ColorTranslation = 0;
+    public float ColorScaling = 1;
+    public TerrainGenerator.VisualitationType VisualisationMethod;
+}

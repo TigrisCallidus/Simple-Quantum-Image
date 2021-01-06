@@ -12,6 +12,7 @@
 // copyright notice, and modified files need to carry a notice indicating
 // that they have been altered from the originals.
 
+using SimpleFileBrowser;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -49,9 +50,11 @@ public class TerrainGenerator : MonoBehaviour {
 
     [Tooltip("The generated Mesh. Can be double clicked to inspect. (And accessed from other scripts)")]
     public Mesh GeneratedMesh;
-    [Tooltip("The used profile for the settings above. Different profiles allow to easy save and switch profiles for different kinds of pcitures.")]
+    [Tooltip("The used profile for the settings above. Different profiles allow to easy save and switch profiles for different kinds of pictures.")]
     public MeshCreationSettings UsedProfile;
 
+    [Tooltip("The name of the file to which settings are exported. Will be a json file directly in the assets folder. ")]
+    public string JsonFileName = "ExportedSettings";
 
 
     //Linking only uncomment the HideInInspector if the link is somehow lost
@@ -412,6 +415,76 @@ public class TerrainGenerator : MonoBehaviour {
         BlurRotation = UsedProfile.BlurRotation;
     }
 
+
+    public void ExportSettingsFile() {
+        if (Application.isPlaying) {
+            FileBrowser.ShowSaveDialog(safeFile, onCancel);
+        } else {
+            safeFile(Path.Combine(Application.dataPath, JsonFileName));
+        }
+    }
+
+    void safeFile(string[] files) {
+        safeFile(files[0]);
+    }
+
+    void safeFile(string file) {
+        SaveSettings();
+
+        MeshCreationExportSettings export = new MeshCreationExportSettings();
+        export.AlwaysDrawBottomCube = AlwaysDrawBottomCube;
+        export.BlurRotation = BlurRotation;
+        export.ColorScaling = ColorScaling;
+        export.ColorTranslation = ColorOffset;
+        export.HeighGradient = HeighGradient;
+        export.Invert = Invert;
+        export.MaxHeight = MaxHeight;
+        export.Threshold = Threshold;
+        export.VisualisationMethod = VisualisationMethod;
+
+
+        string json = JsonUtility.ToJson(export);
+        string path = file;
+        File.WriteAllText(path + ".json", json);
+    }
+
+    //Needed for file browser
+    void onCancel() {
+        Debug.Log("Request got cancelled");
+    }
+
+
+
+    public void ImportSettingsFile() {
+        if (Application.isPlaying) {
+            FileBrowser.SetFilters(false, ".json");
+            FileBrowser.ShowLoadDialog(loadSettingsFromJson, onCancel, false, false, Application.dataPath);
+        } else {
+            loadSettingsFromJson(Path.Combine(Application.dataPath, JsonFileName + ".json"));
+        }
+
+    }
+
+    void loadSettingsFromJson(string[] filePaths) {
+        string file = filePaths[0];
+        loadSettingsFromJson(file);
+    }
+
+    void loadSettingsFromJson(string file) {
+        string json = File.ReadAllText(file);
+        MeshCreationExportSettings export = JsonUtility.FromJson<MeshCreationExportSettings>(json);
+
+        AlwaysDrawBottomCube = export.AlwaysDrawBottomCube;
+        BlurRotation = export.BlurRotation;
+        ColorScaling = export.ColorScaling;
+        ColorOffset = export.ColorTranslation;
+        HeighGradient = export.HeighGradient;
+        Invert = export.Invert;
+        MaxHeight = export.MaxHeight;
+        Threshold = export.Threshold;
+        VisualisationMethod = export.VisualisationMethod;
+
+    }
 
     /// <summary>
     /// Types an image can be visualised as terrain.
