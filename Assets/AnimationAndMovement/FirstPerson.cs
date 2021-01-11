@@ -17,7 +17,11 @@ using UnityEngine;
 
 public class FirstPerson : MonoBehaviour {
 
+#if CINEMACHINE_PRESENT
+
     public Cinemachine.CinemachineBrain Cinemachine;
+
+#endif
 
     public float turnSpeed = 4.0f;
     public float moveSpeed = 2.0f;
@@ -29,7 +33,13 @@ public class FirstPerson : MonoBehaviour {
     private float rotX;
 
     void Awake() {
+
+#if CINEMACHINE_PRESENT
+
         Cinemachine.enabled = false;
+
+#endif
+
     }
 
     void Update() {
