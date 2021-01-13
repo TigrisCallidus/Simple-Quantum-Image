@@ -2,7 +2,7 @@
 // and later shared by Paul Bourke (http://paulbourke.net/geometry/polygonise/)
 // found in a tutorial by Sebastian Lague (https://github.com/SebLague/Marching-Cubes)
 // adapted by Marcel Pfaffhauser
-public class MarchingCubesHelper {
+public static class MarchingCubesHelper {
 
     // Used instead of a big switch case. To look up which meshes are present.
     public static readonly int[] EdgeCase = {
@@ -785,6 +785,64 @@ public class MarchingCubesHelper {
         {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}
     };
 
+
+    public static int[] triangleCounts;
+
+    public static bool[,] vertexNeeded;
+
+    public static int[,] actualVertexNumber;
+
+    public static bool prepared = false;
+
+    public static void GenerateAdvancedData() {
+
+        if (prepared) {
+            return;
+        }
+
+        triangleCounts = new int[256];
+        vertexNeeded = new bool[256, 12];
+        actualVertexNumber = new int[256, 15];
+        int[] missCounts=new int [12];
+
+
+        for (int i = 0; i < triangleCounts.Length; i++) {
+            int tricount = 0;
+            for (int j = 0; j < 15; j+=3) {
+                int tri1 = trianglesFromEdgesZeroes[i, j];
+                int tri2 = trianglesFromEdgesZeroes[i, j+1];
+                int tri3 = trianglesFromEdgesZeroes[i, j+2];
+
+                if (tri1==tri2) {
+                    break;
+                }
+
+                vertexNeeded[i, tri1] = true;
+                vertexNeeded[i, tri2] = true;
+                vertexNeeded[i, tri3] = true;
+
+                tricount += 3;
+            }
+
+
+
+            triangleCounts[i] = tricount;
+            int misscount = 0;
+            for (int j = 0; j < 12; j++) {
+                missCounts[j] = misscount;
+                if (!vertexNeeded[i,j]) {
+                    misscount++;
+                }
+            }
+            for (int j = 0; j < tricount; j++) {
+                int edge = trianglesFromEdgesZeroes[i, j];
+                actualVertexNumber[i, j] = edge - missCounts[edge];
+            }
+        }
+
+
+        prepared = true;
+    }
 
     //Getting the corner from an edge
     public static readonly int[] cornerIndexAFromEdge = {

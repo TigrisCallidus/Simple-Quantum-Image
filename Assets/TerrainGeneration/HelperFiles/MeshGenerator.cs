@@ -370,6 +370,8 @@ public static class MeshGenerator {
         List<Vector3> vertices = new List<Vector3>();
         List<int> triangles = new List<int>();
 
+        //Needed for marching cubes
+        MarchingCubesHelper.GenerateAdvancedData();
 
 
         for (int i = 1; i < dimensionX; i++) {
@@ -377,7 +379,7 @@ public static class MeshGenerator {
             for (int j = 1; j < dimensionY; j++) {
                 posZ = midPosition.z - depth / 2 * dimensionZ;
                 for (int k = 1; k < dimensionZ; k++) {
-                    addMarchingCube(vertices, triangles, posX, posY, posZ,
+                    addMarchingCubeOptimized(vertices, triangles, posX, posY, posZ,
                         width, height, depth,
                         data[i - 1, j - 1, k - 1].Value > threshold && !(i == 1 || j == 1 || k == 1),
                         data[i - 1, j - 1, k].Value > threshold && !(i == 1 || j == 1 || k >= dimensionZ - 1),
@@ -430,18 +432,19 @@ public static class MeshGenerator {
         List<Vector3> vertices = new List<Vector3>();
         List<int> triangles = new List<int>();
 
-
+        //Needed for marching cubes
+        MarchingCubesHelper.GenerateAdvancedData();
 
         for (int i = 1; i < dimensionX; i++) {
             posY = midPosition.y - height / 2 * dimensionZ;
             for (int k = 1; k < dimensionZ; k++) {
                 posZ = midPosition.z - depth / 2 * dimensionY;
                 for (int j = 1; j < dimensionY; j++) {
-                    addMarchingCube(vertices, triangles, posX, posY, posZ,
+                    addMarchingCubeOptimized(vertices, triangles, posX, posY, posZ,
                     width, height, depth,
                     data[i - 1, j - 1, k - 1].Value > threshold && !(i == 1 || j == 1 || k == 1),
                     data[i - 1, j, k - 1].Value > threshold && !(i == 1 || j >= dimensionY - 1 || k == 1),
-                    data[i, j, k - 1].Value > threshold && !(i >= dimensionX - 1 || j >= dimensionY - 1 || k == 1), 
+                    data[i, j, k - 1].Value > threshold && !(i >= dimensionX - 1 || j >= dimensionY - 1 || k == 1),
                     data[i, j - 1, k - 1].Value > threshold && !(i >= dimensionX - 1 || j == 1 || k == 1),
                     data[i - 1, j - 1, k].Value > threshold && !(i == 1 || j == 1 || k >= dimensionZ - 1),
                     data[i - 1, j, k].Value > threshold && !(i == 1 || j >= dimensionY - 1 || k >= dimensionZ - 1),
@@ -492,6 +495,8 @@ public static class MeshGenerator {
         List<Color> colors = new List<Color>();
         List<int> triangles = new List<int>();
 
+        //Needed for marching cubes
+        MarchingCubesHelper.GenerateAdvancedData();
 
 
         for (int i = 1; i < dimensionX; i++) {
@@ -499,7 +504,7 @@ public static class MeshGenerator {
             for (int j = 1; j < dimensionY; j++) {
                 posZ = midPosition.z - depth / 2 * dimensionZ;
                 for (int k = 1; k < dimensionZ; k++) {
-                    addMarchingCube(vertices, triangles, colors, posX, posY, posZ,
+                    addMarchingCubeOptimized(vertices, triangles, colors, posX, posY, posZ,
                         width, height, depth, color, threshold,
                         data[i - 1, j - 1, k - 1].Value > threshold && !(i == 1 || j == 1 || k == 1),
                         data[i - 1, j - 1, k].Value > threshold && !(i == 1 || j == 1 || k >= dimensionZ - 1),
@@ -544,7 +549,7 @@ public static class MeshGenerator {
     public static Mesh ConstructMarchingCubesYZSwitched(Data3D data, Vector3 midPosition, Color color, float threshold = 0.5f, float width = 1, float height = 1, float depth = 1) {
         Mesh returnValue = new Mesh();
         returnValue.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
-        returnValue.name = "Marching Cubes";
+        returnValue.name = "Marching Cubes Advanced";
 
 
 
@@ -563,6 +568,8 @@ public static class MeshGenerator {
         List<Color> colors = new List<Color>();
         List<int> triangles = new List<int>();
 
+        //Needed for marching cubes
+        MarchingCubesHelper.GenerateAdvancedData();
 
 
         for (int i = 1; i < dimensionX; i++) {
@@ -570,11 +577,11 @@ public static class MeshGenerator {
             for (int k = 1; k < dimensionZ; k++) {
                 posZ = midPosition.z - depth / 2 * dimensionY;
                 for (int j = 1; j < dimensionY; j++) {
-                    addMarchingCube(vertices, triangles, colors, posX, posY, posZ,
+                    addMarchingCubeOptimized(vertices, triangles, colors, posX, posY, posZ,
                         width, height, depth, color, threshold,
                         data[i - 1, j - 1, k - 1].Value > threshold && !(i == 1 || j == 1 || k == 1),
                         data[i - 1, j, k - 1].Value > threshold && !(i == 1 || j >= dimensionY - 1 || k == 1),
-                        data[i, j, k - 1].Value > threshold && !(i >= dimensionX - 1 || j >= dimensionY - 1 || k == 1), 
+                        data[i, j, k - 1].Value > threshold && !(i >= dimensionX - 1 || j >= dimensionY - 1 || k == 1),
                         data[i, j - 1, k - 1].Value > threshold && !(i >= dimensionX - 1 || j == 1 || k == 1),
                         data[i - 1, j - 1, k].Value > threshold && !(i == 1 || j == 1 || k >= dimensionZ - 1),
                         data[i - 1, j, k].Value > threshold && !(i == 1 || j >= dimensionY - 1 || k >= dimensionZ - 1),
@@ -1231,14 +1238,295 @@ public static class MeshGenerator {
     }
 
 
-    //TODO adding some way to set colors
-    static void addMarchingCube(List<Vector3> vertices, List<int> triangles, List<Color> colors,
+    // simple version adding vertixes always on the same space.
+    static void addMarchingCubeOptimized(List<Vector3> vertices, List<int> triangles,
+        float midX, float midY, float midZ,
+        float width, float height, float depth,
+        bool in0, bool in1, bool in2, bool in3,
+        bool in4, bool in5, bool in6, bool in7) {
+
+        // Code from Sebastian Lague
+        // Calculate unique index for each cube configuration.
+        // There are 256 possible values
+        // A value of 0 means cube is entirely inside surface; 255 entirely outside.
+        // The value is used to look up the edge table, which indicates which edges of the cube are cut.
+        int cubeIndex = 0;
+        if (in0) cubeIndex |= 1; // if(in0) cubeIndex+=1;
+        if (in1) cubeIndex |= 2;
+        if (in2) cubeIndex |= 4;
+        if (in3) cubeIndex |= 8;
+        if (in4) cubeIndex |= 16;
+        if (in5) cubeIndex |= 32;
+        if (in6) cubeIndex |= 64;
+        if (in7) cubeIndex |= 128;
+
+        //Generating additional data, will only do something if not already initialized.
+        //Should be called in the method calling this method!
+        //MarchingCubesHelper.GenerateAdvancedData();
+
+        //if no vertices are needed do nothing
+
+        int tricount = MarchingCubesHelper.triangleCounts[cubeIndex];
+
+        if (tricount == 0) {
+            return;
+        }
+
+        int vertCount = vertices.Count;
+
+        float halfWidth = width / 2;
+        float halfHeight = height / 2;
+        float halfDepth = depth / 2;
+
+        //front bottom left
+        float xLeft = midX - halfWidth;
+        float yBot = midY - halfHeight;
+        float zFront = midZ - halfDepth;
+
+        //back top right
+        float xRight = midX + halfWidth;
+        float yTop = midY + halfHeight;
+        float zBack = midZ + halfDepth;
+
+
+
+        //We add now only the vertices which are needed.
+
+        //bottom square
+        if (MarchingCubesHelper.vertexNeeded[cubeIndex, 0]) {
+            vertices.Add(new Vector3(xLeft, yBot, midZ));
+        }
+        if (MarchingCubesHelper.vertexNeeded[cubeIndex, 1]) {
+            vertices.Add(new Vector3(midX, yBot, zBack));
+        }
+        if (MarchingCubesHelper.vertexNeeded[cubeIndex, 2]) {
+            vertices.Add(new Vector3(xRight, yBot, midZ));
+        }
+        if (MarchingCubesHelper.vertexNeeded[cubeIndex, 3]) {
+            vertices.Add(new Vector3(midX, yBot, zFront));
+        }
+
+
+        //top square
+        if (MarchingCubesHelper.vertexNeeded[cubeIndex, 4]) {
+            vertices.Add(new Vector3(xLeft, yTop, midZ));
+        }
+        if (MarchingCubesHelper.vertexNeeded[cubeIndex, 5]) {
+            vertices.Add(new Vector3(midX, yTop, zBack));
+        }
+        if (MarchingCubesHelper.vertexNeeded[cubeIndex, 6]) {
+            vertices.Add(new Vector3(xRight, yTop, midZ));
+        }
+        if (MarchingCubesHelper.vertexNeeded[cubeIndex, 7]) {
+            vertices.Add(new Vector3(midX, yTop, zFront));
+        }
+
+
+        //middle square
+        if (MarchingCubesHelper.vertexNeeded[cubeIndex, 8]) {
+            vertices.Add(new Vector3(xLeft, midY, zFront));
+        }
+        if (MarchingCubesHelper.vertexNeeded[cubeIndex, 9]) {
+            vertices.Add(new Vector3(xLeft, midY, zBack));
+        }
+        if (MarchingCubesHelper.vertexNeeded[cubeIndex, 10]) {
+            vertices.Add(new Vector3(xRight, midY, zBack));
+        }
+        if (MarchingCubesHelper.vertexNeeded[cubeIndex, 11]) {
+            vertices.Add(new Vector3(xRight, midY, zFront));
+        }
+
+        //always only the triangles needed
+
+
+        // adding triangles backwards, since somehow they are reverse looking
+        for (int i = tricount - 1; i >= 0; i--) {
+            triangles.Add(vertCount + MarchingCubesHelper.actualVertexNumber[cubeIndex, i]);
+        }
+
+    }
+
+
+
+    static void addMarchingCubeOptimized(List<Vector3> vertices, List<int> triangles, List<Color> colors,
         float midX, float midY, float midZ,
         float width, float height, float depth, Color color, float threshold,
         bool in0, bool in1, bool in2, bool in3,
         bool in4, bool in5, bool in6, bool in7,
         float val0, float val1, float val2, float val3,
         float val4, float val5, float val6, float val7) {
+
+
+        // Code from Sebastian Lague
+        // Calculate unique index for each cube configuration.
+        // There are 256 possible values
+        // A value of 0 means cube is entirely inside surface; 255 entirely outside.
+        // The value is used to look up the edge table, which indicates which edges of the cube are cut.
+        int cubeIndex = 0;
+        if (in0) cubeIndex |= 1;
+        if (in1) cubeIndex |= 2;
+        if (in2) cubeIndex |= 4;
+        if (in3) cubeIndex |= 8;
+        if (in4) cubeIndex |= 16;
+        if (in5) cubeIndex |= 32;
+        if (in6) cubeIndex |= 64;
+        if (in7) cubeIndex |= 128;
+
+        //Generating additional data, will only do something if not already initialized.
+        //Should be called in the method calling this method!
+        //MarchingCubesHelper.GenerateAdvancedData();
+
+        //if no vertices are needed do nothing
+
+        int tricount = MarchingCubesHelper.triangleCounts[cubeIndex];
+
+        if (tricount == 0) {
+            return;
+        }
+
+        int vertCount = vertices.Count;
+
+        float halfWidth = width / 2;
+        float halfHeight = height / 2;
+        float halfDepth = depth / 2;
+
+        //front bottom left
+        float xLeft = midX - halfWidth;
+        float yBot = midY - halfHeight;
+        float zFront = midZ - halfDepth;
+
+        //back top right
+        float xRight = midX + halfWidth;
+        float yTop = midY + halfHeight;
+        float zBack = midZ + halfDepth;
+
+        //Currently all vertices same color
+
+        float posX = 0;
+        float posY = 0;
+        float posZ = 0;
+
+        //bottom square starting left in clockwise direction
+        if (MarchingCubesHelper.vertexNeeded[cubeIndex, 0]) {
+            colors.Add(color);
+            InterpolateVector(xLeft, yBot, zFront,
+    xLeft, yBot, zBack,
+    val0, val1, threshold,
+    out posX, out posY, out posZ);
+            vertices.Add(new Vector3(posX, posY, posZ));
+        }
+        if (MarchingCubesHelper.vertexNeeded[cubeIndex, 1]) {
+            colors.Add(color);
+            InterpolateVector(xLeft, yBot, zBack,
+    xRight, yBot, zBack,
+    val1, val2, threshold,
+    out posX, out posY, out posZ);
+            vertices.Add(new Vector3(posX, posY, posZ));
+        }
+        if (MarchingCubesHelper.vertexNeeded[cubeIndex, 2]) {
+            colors.Add(color);
+            InterpolateVector(xRight, yBot, zBack,
+    xRight, yBot, zFront,
+    val2, val3, threshold,
+    out posX, out posY, out posZ);
+            vertices.Add(new Vector3(posX, posY, posZ));
+        }
+        if (MarchingCubesHelper.vertexNeeded[cubeIndex, 3]) {
+            colors.Add(color);
+            InterpolateVector(xRight, yBot, zFront,
+    xLeft, yBot, zFront,
+    val3, val0, threshold,
+    out posX, out posY, out posZ);
+            vertices.Add(new Vector3(posX, posY, posZ));
+        }
+
+
+        //top squaresquare starting left in clockwise direction
+        if (MarchingCubesHelper.vertexNeeded[cubeIndex, 4]) {
+            colors.Add(color);
+            InterpolateVector(xLeft, yTop, zFront,
+    xLeft, yTop, zBack,
+    val4, val5, threshold,
+    out posX, out posY, out posZ);
+            vertices.Add(new Vector3(posX, posY, posZ));
+        }
+        if (MarchingCubesHelper.vertexNeeded[cubeIndex, 5]) {
+            colors.Add(color);
+            InterpolateVector(xLeft, yTop, zBack,
+    xRight, yTop, zBack,
+    val5, val6, threshold,
+    out posX, out posY, out posZ);
+            vertices.Add(new Vector3(posX, posY, posZ));
+        }
+        if (MarchingCubesHelper.vertexNeeded[cubeIndex, 6]) {
+            colors.Add(color);
+            InterpolateVector(xRight, yTop, zBack,
+    xRight, yTop, zFront,
+    val6, val7, threshold,
+    out posX, out posY, out posZ);
+            vertices.Add(new Vector3(posX, posY, posZ));
+        }
+        if (MarchingCubesHelper.vertexNeeded[cubeIndex, 7]) {
+            colors.Add(color);
+            InterpolateVector(xRight, yTop, zFront,
+    xLeft, yTop, zFront,
+    val7, val4, threshold,
+    out posX, out posY, out posZ);
+            vertices.Add(new Vector3(posX, posY, posZ));
+        }
+
+
+        //middle square starting front left going in clockwise direction
+        if (MarchingCubesHelper.vertexNeeded[cubeIndex, 8]) {
+            colors.Add(color);
+            InterpolateVector(xLeft, yBot, zFront,
+    xLeft, yTop, zFront,
+    val0, val4, threshold,
+    out posX, out posY, out posZ);
+            vertices.Add(new Vector3(posX, posY, posZ));
+        }
+        if (MarchingCubesHelper.vertexNeeded[cubeIndex, 9]) {
+            colors.Add(color);
+            InterpolateVector(xLeft, yBot, zBack,
+    xLeft, yTop, zBack,
+    val1, val5, threshold,
+    out posX, out posY, out posZ);
+            vertices.Add(new Vector3(posX, posY, posZ));
+        }
+        if (MarchingCubesHelper.vertexNeeded[cubeIndex, 10]) {
+            colors.Add(color);
+            InterpolateVector(xRight, yBot, zBack,
+    xRight, yTop, zBack,
+    val2, val6, threshold,
+    out posX, out posY, out posZ);
+            vertices.Add(new Vector3(posX, posY, posZ));
+        }
+        if (MarchingCubesHelper.vertexNeeded[cubeIndex, 11]) {
+            colors.Add(color);
+            InterpolateVector(xRight, yBot, zFront,
+    xRight, yTop, zFront,
+    val3, val7, threshold,
+    out posX, out posY, out posZ);
+            vertices.Add(new Vector3(posX, posY, posZ));
+        }
+
+        //always only the triangles needed
+
+        // adding triangles backwards, since somehow they are reverse looking
+        for (int i = tricount - 1; i >= 0; i--) {
+            triangles.Add(vertCount + MarchingCubesHelper.actualVertexNumber[cubeIndex, i]);
+        }
+
+    }
+
+
+    static void addMarchingCube(List<Vector3> vertices, List<int> triangles, List<Color> colors,
+    float midX, float midY, float midZ,
+    float width, float height, float depth, Color color, float threshold,
+    bool in0, bool in1, bool in2, bool in3,
+    bool in4, bool in5, bool in6, bool in7,
+    float val0, float val1, float val2, float val3,
+    float val4, float val5, float val6, float val7) {
 
         int vertCount = vertices.Count;
 
@@ -1381,6 +1669,8 @@ public static class MeshGenerator {
         }
 
     }
+
+
 
 
     #endregion

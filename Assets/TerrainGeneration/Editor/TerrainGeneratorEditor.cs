@@ -65,13 +65,14 @@ public class TerrainGeneratorEditor : Editor {
             AssetDatabase.SaveAssets();
         }
 
-        if (GUILayout.Button("Save settings to file")) {
+        if (GUILayout.Button("Save settings to local settings file")) {
             targetScript.SaveSettings();
         }
 
-        if (GUILayout.Button("Load settings from file")) {
+        if (GUILayout.Button("Load settings from local settings file")) {
             targetScript.LoadSettings();
         }
+
 
         if (GUILayout.Button("Export settings to json")) {
             targetScript.ExportSettingsFile();
