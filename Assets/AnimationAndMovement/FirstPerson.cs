@@ -73,4 +73,12 @@ public class FirstPerson : MonoBehaviour {
         }
 
     }
+
+    public void MoveCamera(Transform target) {
+#if CINEMACHINE_PRESENT
+        Cinemachine.enabled = false;
+#endif
+        this.transform.position = target.transform.position;
+        this.transform.rotation = target.transform.rotation;
+    }
 }

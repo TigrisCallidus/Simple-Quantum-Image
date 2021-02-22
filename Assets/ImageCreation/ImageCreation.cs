@@ -81,6 +81,8 @@ public class ImageCreation : MonoBehaviour {
     public RawImage OutputImage;
 
 
+    public QuantumCircuit demoCircuit;
+
     /*
     private IEnumerator Start() {
         Application.targetFrameRate = 30;
@@ -173,6 +175,8 @@ public class ImageCreation : MonoBehaviour {
             blueData = QuantumImageHelper.CircuitToHeight2D(blue, InputTexture1.width, InputTexture1.height, RenormalizeImage);
         }
 
+
+        demoCircuit = red;
         OutputTexture = QuantumImageHelper.CalculateColorTexture(redData, greenData, blueData);
 
         OutputImage.texture = OutputTexture;
