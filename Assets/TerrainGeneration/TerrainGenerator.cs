@@ -67,6 +67,13 @@ public class TerrainGenerator : MonoBehaviour {
     [HideInInspector]
     public Data3D Data3D;
 
+    [HideInInspector]
+    public bool MixGradiants = false;
+    [HideInInspector]
+    public Gradient HeighGradient2;
+    [HideInInspector]
+    public float GradientMixvalue = 0;
+
     //Path to the generatedMeshes folder change if you move this plugin around
     const string path = "Assets/Visuals/GeneratedMeshes/";
 
@@ -188,7 +195,16 @@ public class TerrainGenerator : MonoBehaviour {
     /// <summary>
     /// Generating a mesh (terrain) representation of the chosen image, according to the selected visualisation method.
     /// </summary>
-    public void GenerateMesh(bool doColoring = true) {
+    public void GenerateMesh(bool doColoring = true, float maxheight=0) {
+
+        if (maxheight==0) {
+            maxheight = MaxHeight;
+        }
+
+        if (MixGradiants) {
+            MixGradiants = false;
+            Debug.Log("setting MixGradients to false");
+        }
 
         if (VisualisationMethod == VisualitationType.Noise2D) {
             if (Data2D == null) {
@@ -208,13 +224,13 @@ public class TerrainGenerator : MonoBehaviour {
                 GeneratedMesh = Generate3DNoise(Data3D, Threshold, AlwaysDrawBottomCube);
                 break;
             case VisualitationType.Terrain:
-                GeneratedMesh = GenerateTerrain(Data2D, MaxHeight);
+                GeneratedMesh = GenerateTerrain(Data2D, maxheight);
                 break;
             case VisualitationType.MarshingCubes:
-                GeneratedMesh = GenerateMarshingCubes(Data3D, Threshold, MaxHeight, AlwaysDrawBottomCube);
+                GeneratedMesh = GenerateMarshingCubes(Data3D, Threshold, maxheight, AlwaysDrawBottomCube);
                 break;
             case VisualitationType.MarshingCubesAdvanced:
-                GeneratedMesh = GenerateMarshingCubesAdvanced(Data3D, Threshold, MaxHeight, AlwaysDrawBottomCube);
+                GeneratedMesh = GenerateMarshingCubesAdvanced(Data3D, Threshold, maxheight, AlwaysDrawBottomCube);
                 break;
             default:
                 break;
@@ -317,7 +333,7 @@ public class TerrainGenerator : MonoBehaviour {
     /// <param name="data2D">The height data representation of the image</param>
     /// <param name="maxHeight">The maximum height the terrain should have </param>
     /// <returns>Returns a mesh representing the generated terrain.</returns>
-    public static Mesh GenerateTerrain(DataGrid data2D, int maxHeight) {
+    public static Mesh GenerateTerrain(DataGrid data2D, float maxHeight) {
         return MeshGenerator.ConstructGrid(data2D, maxHeight);
     }
 
@@ -329,7 +345,7 @@ public class TerrainGenerator : MonoBehaviour {
     /// <param name="maxHeight">The maximum height the mesh will have</param>
     /// <param name="alwaysDrawBottomCube">With this parameter set the lowest place of cubes is always drawn. Making sure there are no "holes"</param>
     /// <returns>Returns a mesh being made with marching cubes representing the image.</returns>
-    public static Mesh GenerateMarshingCubes(Data3D data3D, float threshold, int maxHeight, bool alwaysDrawBottomCube = true) {
+    public static Mesh GenerateMarshingCubes(Data3D data3D, float threshold, float maxHeight, bool alwaysDrawBottomCube = true) {
         float starty = 0.5f * maxHeight + 1;
         if (alwaysDrawBottomCube) {
             starty = starty - 0.5f;
@@ -346,7 +362,7 @@ public class TerrainGenerator : MonoBehaviour {
     /// <param name="alwaysDrawBottomCube">With this parameter set the lowest place of cubes is always drawn. Making sure there are no "holes"</param>
     /// <returns>Returns a mesh being made with the advanced marching cubes representing the image.</returns>
 
-    public static Mesh GenerateMarshingCubesAdvanced(Data3D data3D, float threshold, int maxHeight, bool alwaysDrawBottomCube = true) {
+    public static Mesh GenerateMarshingCubesAdvanced(Data3D data3D, float threshold, float maxHeight, bool alwaysDrawBottomCube = true) {
         float starty = 0.5f * maxHeight + 1;
         if (alwaysDrawBottomCube) {
             starty = starty - 0.5f;
@@ -379,7 +395,13 @@ public class TerrainGenerator : MonoBehaviour {
 
         Color[] colors = new Color[vertexCount];
         for (int i = 0; i < vertexCount; i++) {
-            colors[i] = HeighGradient.Evaluate((vertices[i].y / MaxHeight) * ColorScaling + ColorOffset);
+            if (!MixGradiants) {
+                colors[i] = HeighGradient.Evaluate((vertices[i].y / MaxHeight) * ColorScaling + ColorOffset);
+            } else {
+                Color color1 = HeighGradient.Evaluate((vertices[i].y / MaxHeight) * ColorScaling + ColorOffset);
+                Color color2 = HeighGradient2.Evaluate((vertices[i].y / MaxHeight) * ColorScaling + ColorOffset);
+                colors[i] = Color.Lerp(color1, color2, GradientMixvalue);
+            }
         }
 
         GeneratedMesh.colors = colors;

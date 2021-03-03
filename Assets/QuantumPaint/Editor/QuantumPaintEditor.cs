@@ -37,6 +37,7 @@ public class QuantumPaintEditor : Editor {
 
     SerializedProperty FileName;
 
+    SerializedProperty QiskitString;
 
 
     void OnEnable() {
@@ -58,7 +59,8 @@ public class QuantumPaintEditor : Editor {
 
         FileName = serializedObject.FindProperty(nameof(targetScript.FileName));
 
-        
+        QiskitString = serializedObject.FindProperty(nameof(targetScript.QiskitString));
+
     }
 
 
@@ -103,6 +105,7 @@ public class QuantumPaintEditor : Editor {
             EditorGUILayout.PropertyField(renormalizeImage);
             EditorGUILayout.PropertyField(Circuit);
             EditorGUILayout.PropertyField(Gates);
+            EditorGUILayout.PropertyField(QiskitString);
 
         }
 

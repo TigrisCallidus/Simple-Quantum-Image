@@ -2342,47 +2342,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 406667753}
   m_CullTransparentMesh: 0
---- !u!28 &415393166
-Texture2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: 
-  m_ImageContentsHash:
-    serializedVersion: 2
-    Hash: 00000000000000000000000000000000
-  m_ForcedFallbackFormat: 4
-  m_DownscaleFallback: 0
-  serializedVersion: 2
-  m_Width: 4
-  m_Height: 4
-  m_CompleteImageSize: 84
-  m_TextureFormat: 4
-  m_MipCount: 3
-  m_IsReadable: 1
-  m_IgnoreMasterTextureLimit: 0
-  m_StreamingMipmaps: 0
-  m_StreamingMipmapsPriority: 0
-  m_AlphaIsTransparency: 0
-  m_ImageCount: 1
-  m_TextureDimension: 2
-  m_TextureSettings:
-    serializedVersion: 2
-    m_FilterMode: 0
-    m_Aniso: 1
-    m_MipBias: 0
-    m_WrapU: 1
-    m_WrapV: 1
-    m_WrapW: 1
-  m_LightmapFormat: 0
-  m_ColorSpace: 0
-  image data: 84
-  _typelessdata: ffffffff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff3f3f3fff000000ff000000ff000000ff0f0f0fff
-  m_StreamData:
-    offset: 0
-    size: 0
-    path: 
 --- !u!1 &418859337
 GameObject:
   m_ObjectHideFlags: 0
@@ -6445,7 +6404,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 415393166}
+  m_Texture: {fileID: 1928474539}
   m_UVRect:
     serializedVersion: 2
     x: 0
@@ -6962,34 +6921,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 345913a33641efa4da9522bab8b2f091, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Size: 0
+  Size: 3
   PaintColor: {r: 1, g: 1, b: 1, a: 1}
   Type: 0
-  Strength: 0.546
-  AxisToReflect: 2
-  ShowAdvanced: 0
+  Strength: 0.5
+  AxisToReflect: 5
+  ShowAdvanced: 1
   UseSimpleEncoding: 0
   RenormalizeImage: 1
   Circuit:
-    NumberOfQubits: 4
-    NumberOfOutputs: 4
+    NumberOfQubits: 10
+    NumberOfOutputs: 10
     Gates:
     - CircuitType: 1
-      First: 1
+      First: 4
       Second: 0
-      Theta: 0.6126105620270295
-    - CircuitType: 1
-      First: 1
-      Second: 0
-      Theta: 1.0932742424137842
-    - CircuitType: 1
-      First: 0
-      Second: 0
-      Theta: 1.0932742424137842
-    - CircuitType: 1
-      First: 2
-      Second: 0
-      Theta: 1.7153096485770902
+      Theta: 3.1415927410125732
     Amplitudes:
     - Real: 1
       Complex: 0
@@ -7023,14 +6970,2030 @@ MonoBehaviour:
       Complex: 0
     - Real: 0
       Complex: 0
-    AmplitudeLength: 16
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    - Real: 0
+      Complex: 0
+    AmplitudeLength: 1024
     DimensionString: 
-    OriginalSum: 0.23137255012989041
+    OriginalSum: 0
   Gates: []
   TargetImage: {fileID: 1411583531}
   FileName: quantumPaint
   FolderName: Visuals
-  logSize: 2
+  logSize: 5
   Vertical:
   - {fileID: 1387130864}
   - {fileID: 1874350083}
@@ -7043,6 +9006,14 @@ MonoBehaviour:
   - {fileID: 1784208568}
   - {fileID: 30735864}
   - {fileID: 1155700358}
+  QiskitString: 'qc = QuantumCircuit(10,10)
+
+    qc.rx(3.14159274101257, 4)
+
+    qc.measure([0,1,2,3,4,5,6,7,8,9],
+    [0,1,2,3,4,5,6,7,8,9])
+
+'
 --- !u!4 &1550585325
 Transform:
   m_ObjectHideFlags: 0
@@ -8498,6 +10469,47 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1921201829}
   m_CullTransparentMesh: 0
+--- !u!28 &1928474539
+Texture2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  m_ImageContentsHash:
+    serializedVersion: 2
+    Hash: 00000000000000000000000000000000
+  m_ForcedFallbackFormat: 4
+  m_DownscaleFallback: 0
+  serializedVersion: 2
+  m_Width: 32
+  m_Height: 32
+  m_CompleteImageSize: 5460
+  m_TextureFormat: 4
+  m_MipCount: 6
+  m_IsReadable: 1
+  m_IgnoreMasterTextureLimit: 0
+  m_StreamingMipmaps: 0
+  m_StreamingMipmapsPriority: 0
+  m_AlphaIsTransparency: 0
+  m_ImageCount: 1
+  m_TextureDimension: 2
+  m_TextureSettings:
+    serializedVersion: 2
+    m_FilterMode: 0
+    m_Aniso: 1
+    m_MipBias: 0
+    m_WrapU: 1
+    m_WrapV: 1
+    m_WrapW: 1
+  m_LightmapFormat: 0
+  m_ColorSpace: 0
+  image data: 5460
+  _typelessdata: ffffffff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff3f3f3fff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff0f0f0fff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff030303ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff
+  m_StreamData:
+    offset: 0
+    size: 0
+    path: 
 --- !u!1 &1972552501
 GameObject:
   m_ObjectHideFlags: 0

@@ -59,6 +59,8 @@ public class QuantumPaint : MonoBehaviour {
     public GameObject[] Vertical;
     public GameObject[] Horizontal;
 
+    public string QiskitString;
+
     Texture2D startTexture;
     Texture2D currentTexture;
     int size;
@@ -122,6 +124,7 @@ public class QuantumPaint : MonoBehaviour {
         outPutTexture = QuantumImageHelper.CalculateColorTexture(redData, redData, redData, PaintColor.r,PaintColor.g, PaintColor.b);
         outPutTexture.filterMode = FilterMode.Point;
         outPutTexture.wrapMode = TextureWrapMode.Clamp;
+        QiskitString = red.GetQiskitString(true);
 
         return outPutTexture;
 
