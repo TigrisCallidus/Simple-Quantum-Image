@@ -13,6 +13,7 @@
 // that they have been altered from the originals.
 using Qiskit;
 using QuantumImage;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -43,9 +44,8 @@ public class QuantumPaint : MonoBehaviour {
     public bool UseSimpleEncoding = false;
     public bool RenormalizeImage = true;
 
-
-    public QuantumCircuit Circuit;
     public List<Gate> Gates;
+    public QuantumCircuit Circuit;
     public RawImage TargetImage;
 
     [Header("File Management")]
@@ -55,6 +55,7 @@ public class QuantumPaint : MonoBehaviour {
 
     public int logSize = 2;
 
+    public TextAsset Text;
 
     public GameObject[] Vertical;
     public GameObject[] Horizontal;
@@ -121,7 +122,7 @@ public class QuantumPaint : MonoBehaviour {
         }
 
         //outPutTexture = QuantumImageHelper.CalculateColorTexture(redData, greenData, blueData);
-        outPutTexture = QuantumImageHelper.CalculateColorTexture(redData, redData, redData, PaintColor.r,PaintColor.g, PaintColor.b);
+        outPutTexture = QuantumImageHelper.CalculateColorTexture(redData, redData, redData, PaintColor.r, PaintColor.g, PaintColor.b);
         outPutTexture.filterMode = FilterMode.Point;
         outPutTexture.wrapMode = TextureWrapMode.Clamp;
         QiskitString = red.GetQiskitString(true);
@@ -136,28 +137,34 @@ public class QuantumPaint : MonoBehaviour {
 
         switch (Size) {
             case ImageSize._4x4:
-                size = 4;
                 logSize = 2;
+                size = 4;
+                //Quantumcircuit 4
                 break;
             case ImageSize._8x8:
                 logSize = 3;
                 size = 8;
+                //Quantumcircuit 6
                 break;
             case ImageSize._16x16:
                 logSize = 4;
                 size = 16;
+                //Quantumcircuit 8
                 break;
             case ImageSize._32x32:
                 logSize = 5;
                 size = 32;
+                //Quantumcircuit 10
                 break;
             case ImageSize._64x64:
                 logSize = 6;
                 size = 64;
+                //Quantumcircuit 12
                 break;
             case ImageSize._128x128:
                 logSize = 7;
                 size = 128;
+                //Quantumcircuit 14
                 break;
             default:
                 break;
@@ -189,9 +196,9 @@ public class QuantumPaint : MonoBehaviour {
         GateToAdd = new Gate();
         GateToAdd.CircuitType = CircuitType.RX;
         GateToAdd.Theta = Strength * Mathf.PI;
-        GateToAdd.First = AxisToReflect-1;
+        GateToAdd.First = AxisToReflect - 1;
         if (Type == ReflectionType.Vertical) {
-            GateToAdd.First = AxisToReflect-1 + logSize;
+            GateToAdd.First = AxisToReflect - 1 + logSize;
         }
         Gates.Add(GateToAdd);
         ApplyGates();
@@ -199,8 +206,8 @@ public class QuantumPaint : MonoBehaviour {
 
 
     public void Undo() {
-        if (Gates.Count>0) {
-            Gates.RemoveAt(Gates.Count-1);
+        if (Gates.Count > 0) {
+            Gates.RemoveAt(Gates.Count - 1);
             ApplyGates();
         }
     }
@@ -211,8 +218,170 @@ public class QuantumPaint : MonoBehaviour {
 
     }
 
+    public void OptimizeGates() {
 
+        int gateCount = Gates.Count;
+        if (gateCount < 2) {
+            return;
+        }
 
+        List<Gate> newGates = new List<Gate>();
+        Gate lastGate = Gates[0];
+        double TwoPi = MathHelper.Pi * 2;
+
+        for (int i = 1; i < gateCount; i++) {
+            Gate nextGate = Gates[i];
+            if (lastGate.CircuitType == CircuitType.RX && nextGate.CircuitType == CircuitType.RX && lastGate.First == nextGate.First) {
+                lastGate.Theta = lastGate.Theta + nextGate.Theta;
+            } else {
+                if (lastGate.CircuitType == CircuitType.RX) {
+                    lastGate.Theta = lastGate.Theta % TwoPi;
+                    if (lastGate.Theta > MathHelper.Pi) {
+                        //TODO better improve
+                        //lastGate.Theta = TwoPi - lastGate.Theta;
+                    }
+                }
+                newGates.Add(lastGate);
+                lastGate = nextGate;
+            }
+        }
+        if (lastGate.CircuitType == CircuitType.RX) {
+            lastGate.Theta = lastGate.Theta % TwoPi;
+            if (lastGate.Theta > MathHelper.Pi) {
+                //TODO better improve
+                //lastGate.Theta = TwoPi - lastGate.Theta;
+            }
+        }
+        newGates.Add(lastGate);
+        Gates = newGates;
+
+        currentTexture = CircuitToTexture();
+        TargetImage.texture = currentTexture;
+    }
+
+    public void ConstructGateFromString() {
+
+        string text = Text.text;
+
+        Debug.Log(text);
+
+        string[] lines = text.Split(new string[] { "\n" , "\r\n", "\r"}, StringSplitOptions.None);
+
+        Debug.Log("Text: " + lines.Length);
+
+        if (lines.Length < 2) {
+            return;
+        }
+        string tmp = lines[0].Replace("qc = QuantumCircuit(", "");
+        tmp = tmp.Replace(")", "");
+        tmp = tmp.Split(new string[] { ", ", "," }, StringSplitOptions.None)[0];
+        int qubits = 0;
+
+        if (!int.TryParse(tmp, out qubits)) {
+            Debug.Log("cant parse " + tmp );
+            return;
+        }
+
+        Debug.Log("Needing " + qubits + " qubits");
+        switch (qubits) {
+            case 4:
+                Size = ImageSize._4x4;
+                break;
+            case 6:
+                Size = ImageSize._8x8;
+                break;
+            case 8:
+                Size = ImageSize._16x16;
+                break;
+            case 10:
+                Size = ImageSize._32x32;
+                break;
+            case 12:
+                Size = ImageSize._64x64;
+                break;
+            case 14:
+                Size = ImageSize._128x128;
+                break;
+            default:
+                Debug.Log("Strange qubit number " + qubits);
+                return;
+        }
+        InitializeImage();
+
+        for (int i = 1; i < lines.Length; i++) {
+            ParseGate(lines[i]);
+        }
+        currentTexture = CircuitToTexture();
+        TargetImage.texture = currentTexture;
+    }
+
+    public void ParseGate(string line) {
+        if (!line.StartsWith("qc.")) {
+            Debug.Log("line starts wrong: " + line);
+            return;
+        }
+
+        if (line.StartsWith("qc.x(")) {
+            line = line.Replace("qc.x(", "");
+            line = line.Replace(")", "");
+            int first;
+            if (int.TryParse(line, out first)) {
+                Gate gate = new Gate();
+                gate.CircuitType = CircuitType.X;
+                gate.First = first;
+                Gates.Add(gate);
+            }
+
+        }else if (line.StartsWith("qc.rx(")) {
+            line = line.Replace("qc.rx(", "");
+            line = line.Replace(")", "");
+            string[] lines = line.Split(new string[] { ", " }, StringSplitOptions.None);
+            double theta;
+            int first;
+            if (double.TryParse(lines[0], out theta)) {
+                if (int.TryParse(lines[1], out first)) {
+                    Gate gate = new Gate();
+                    gate.CircuitType = CircuitType.RX;
+                    gate.First = first;
+                    gate.Theta = theta;
+                    Gates.Add(gate);
+                }
+            }
+
+        }else if (line.StartsWith("qc.h(")) {
+            line = line.Replace("qc.h(", "");
+            line = line.Replace(")", "");
+            int first;
+            if (int.TryParse(line, out first)) {
+                Gate gate = new Gate();
+                gate.CircuitType = CircuitType.H;
+                gate.First = first;
+                Gates.Add(gate);
+            }
+
+        }else if (line.StartsWith("qc.cx(")) {
+            line = line.Replace("qc.cx(", "");
+            line = line.Replace(")", "");
+            string[] lines = line.Split(new string[] { ", " }, StringSplitOptions.None);
+            int second;
+            int first;
+            if (int.TryParse(lines[0], out first)) {
+                if (int.TryParse(lines[1], out second)) {
+                    Gate gate = new Gate();
+                    gate.CircuitType = CircuitType.CX;
+                    gate.First = first;
+                    gate.Second = second;
+                    Gates.Add(gate);
+                }
+            }
+
+        } else if (line.StartsWith("qc.crx(")) {
+            //not yet implemented
+        } else {
+            Debug.Log("line is strange: " + line);
+        }
+
+    }
 
 
     public Texture2D CreateBlur(Texture2D inputeTExture, float rotation) {
@@ -352,10 +521,10 @@ public class QuantumPaint : MonoBehaviour {
         for (int i = 0; i < Vertical.Length; i++) {
             Vertical[i].SetActive(false);
         }
-        if (target<=highlights.Length) {
+        if (target <= highlights.Length) {
             highlights[target].SetActive(true);
         }
-        
+
 
     }
 
@@ -401,3 +570,5 @@ public class QuantumPaint : MonoBehaviour {
     }
     */
 }
+
+

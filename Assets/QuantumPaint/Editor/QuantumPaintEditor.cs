@@ -36,6 +36,7 @@ public class QuantumPaintEditor : Editor {
     SerializedProperty Gates;
 
     SerializedProperty FileName;
+    SerializedProperty Text;
 
     SerializedProperty QiskitString;
 
@@ -58,6 +59,7 @@ public class QuantumPaintEditor : Editor {
         Gates = serializedObject.FindProperty(nameof(targetScript.Gates));
 
         FileName = serializedObject.FindProperty(nameof(targetScript.FileName));
+        Text = serializedObject.FindProperty(nameof(targetScript.Text));
 
         QiskitString = serializedObject.FindProperty(nameof(targetScript.QiskitString));
 
@@ -94,23 +96,28 @@ public class QuantumPaintEditor : Editor {
         if (GUILayout.Button("Add Reflection")) {
             targetScript.AddGate();
         }
-        if (GUILayout.Button("Undo")) {
+        if (GUILayout.Button("Remove last Operation")) {
             targetScript.Undo();
         }
-
+        if (GUILayout.Button("Optimize Circuit")) {
+            targetScript.OptimizeGates();
+        }
         EditorGUILayout.PropertyField(showAdvanced);
 
         if (targetScript.ShowAdvanced) {
             EditorGUILayout.PropertyField(useSimpleEncoding);
             EditorGUILayout.PropertyField(renormalizeImage);
-            EditorGUILayout.PropertyField(Circuit);
             EditorGUILayout.PropertyField(Gates);
+            //EditorGUILayout.PropertyField(Circuit);
+            if (GUILayout.Button("Update Image ")) {
+                targetScript.ApplyGates();
+            }
             EditorGUILayout.PropertyField(QiskitString);
 
         }
 
-
         EditorGUILayout.PropertyField(FileName);
+        EditorGUILayout.PropertyField(Text);
         EditorGUILayout.Space();
 
         if (GUILayout.Button("Save File")) {
@@ -118,6 +125,10 @@ public class QuantumPaintEditor : Editor {
             AssetDatabase.Refresh();
 
         }
+        if (GUILayout.Button("Construct Circuit from Text File ")) {
+            targetScript.ConstructGateFromString();
+        }
+
         serializedObject.ApplyModifiedProperties();
 
         if (lastAxis!=targetScript.AxisToReflect || lastType !=targetScript.Type) {
