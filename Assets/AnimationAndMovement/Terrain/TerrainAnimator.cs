@@ -6,6 +6,8 @@ public class TerrainAnimator : MonoBehaviour {
 
     public TerrainGenerator Generator;
     public AnimationType TypeOfAnimation;
+    public bool PrepareMeshesBefore = false;
+
 
     public float AnimationDuration = 5;
     public float WaitTime = 1f;
@@ -31,8 +33,6 @@ public class TerrainAnimator : MonoBehaviour {
     public bool HeighPerLoudness = true;
 
     float[] lastLoudness = new float[recordedFrames];
-
-    public bool PrepareMeshesBefore = false;
 
     public Mesh[] GeneratedMeshes;
 
