@@ -71,6 +71,7 @@ public class QuantumPaintEditor : Editor {
 
         // Let the default inspecter draw all the values
         //DrawDefaultInspector();
+        //return;
 
         int lastAxis = targetScript.AxisToReflect;
         QuantumPaint.ReflectionType lastType = targetScript.Type;
@@ -107,11 +108,8 @@ public class QuantumPaintEditor : Editor {
         if (targetScript.ShowAdvanced) {
             EditorGUILayout.PropertyField(useSimpleEncoding);
             EditorGUILayout.PropertyField(renormalizeImage);
-            EditorGUILayout.PropertyField(Gates);
-            //EditorGUILayout.PropertyField(Circuit);
-            if (GUILayout.Button("Update Image ")) {
-                targetScript.ApplyGates();
-            }
+            //EditorGUILayout.PropertyField(Gates);
+            EditorGUILayout.PropertyField(Circuit);
             EditorGUILayout.PropertyField(QiskitString);
 
         }
@@ -135,7 +133,9 @@ public class QuantumPaintEditor : Editor {
             targetScript.ShowPreview();
         }
 
-
+        if (GUILayout.Button("Generate Image from Gates ")) {
+            targetScript.CreateCircuitFromHolder();
+        }
 
         // Spawn buttons
 

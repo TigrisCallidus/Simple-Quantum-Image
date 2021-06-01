@@ -62,6 +62,8 @@ public class QuantumPaint : MonoBehaviour {
 
     public string QiskitString;
 
+    public CircuitHolder Holder;
+
     Texture2D startTexture;
     Texture2D currentTexture;
     int size;
@@ -182,14 +184,16 @@ public class QuantumPaint : MonoBehaviour {
 
         texture.SetPixel(0, 0, PaintColor);
 
+        startTexture = texture;
+        Gates = new List<Gate>();
+
         texture.Apply();
 
-        startTexture = texture;
-
-        Gates = new List<Gate>();
         TargetImage.texture = startTexture;
         currentTexture = startTexture;
         ShowPreview();
+        ApplyGates();
+
     }
 
     public void AddGate() {
@@ -213,10 +217,20 @@ public class QuantumPaint : MonoBehaviour {
     }
 
     public void ApplyGates() {
+        Holder.Gates = Gates;
         currentTexture = CircuitToTexture();
         TargetImage.texture = currentTexture;
 
     }
+
+    public void CreateCircuitFromHolder() {
+        Gates = Holder.Gates;
+        currentTexture = CircuitToTexture();
+        TargetImage.texture = currentTexture;
+
+    }
+
+
 
     public void OptimizeGates() {
 
@@ -254,9 +268,9 @@ public class QuantumPaint : MonoBehaviour {
         }
         newGates.Add(lastGate);
         Gates = newGates;
+        ApplyGates();
 
-        currentTexture = CircuitToTexture();
-        TargetImage.texture = currentTexture;
+
     }
 
     public void ConstructGateFromString() {
@@ -311,8 +325,8 @@ public class QuantumPaint : MonoBehaviour {
         for (int i = 1; i < lines.Length; i++) {
             ParseGate(lines[i]);
         }
-        currentTexture = CircuitToTexture();
-        TargetImage.texture = currentTexture;
+        ApplyGates();
+
     }
 
     public void ParseGate(string line) {
