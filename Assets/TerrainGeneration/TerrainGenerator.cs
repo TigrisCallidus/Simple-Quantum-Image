@@ -73,6 +73,9 @@ public class TerrainGenerator : MonoBehaviour {
     public Gradient HeighGradient2;
     [HideInInspector]
     public float GradientMixvalue = 0;
+    [HideInInspector]
+    public LightningController Lightning;
+
 
     //Path to the generatedMeshes folder change if you move this plugin around
     const string path = "Assets/Visuals/GeneratedMeshes/";
@@ -195,9 +198,9 @@ public class TerrainGenerator : MonoBehaviour {
     /// <summary>
     /// Generating a mesh (terrain) representation of the chosen image, according to the selected visualisation method.
     /// </summary>
-    public void GenerateMesh(bool doColoring = true, float maxheight=0) {
+    public void GenerateMesh(bool doColoring = true, float maxheight = 0) {
 
-        if (maxheight==0) {
+        if (maxheight == 0) {
             maxheight = MaxHeight;
         }
 
@@ -240,7 +243,7 @@ public class TerrainGenerator : MonoBehaviour {
             ColorMesh();
         }
 
-        if (TargetMesh!=null) {
+        if (TargetMesh != null) {
             TargetMesh.mesh = GeneratedMesh;
 
         } else {
@@ -384,7 +387,7 @@ public class TerrainGenerator : MonoBehaviour {
     /// </summary>
     public void ColorMesh() {
 
-        if (GeneratedMesh==null) {
+        if (GeneratedMesh == null) {
             Debug.LogWarning("There is no mesh generated. Generating mesh.");
             GenerateMesh(false);
         }
@@ -411,6 +414,13 @@ public class TerrainGenerator : MonoBehaviour {
     /// Saving the settings to the selected settings file (profile)
     /// </summary>
     public void SaveSettings() {
+        if (UsedProfile.Locked) {
+            Debug.LogWarning("Cant overwrite locked file");
+            return;
+        }
+
+        UsedProfile.Texture = TextureToBlur;
+
         UsedProfile.MaxHeight = MaxHeight;
         UsedProfile.Invert = Invert;
         UsedProfile.Threshold = Threshold;
@@ -420,12 +430,51 @@ public class TerrainGenerator : MonoBehaviour {
         UsedProfile.ColorScaling = ColorScaling;
         UsedProfile.VisualisationMethod = VisualisationMethod;
         UsedProfile.BlurRotation = BlurRotation;
+
+        UsedProfile.CameraPosition = Lightning.MainCamera.transform.position;
+        UsedProfile.CameraRotation = Lightning.MainCamera.transform.rotation;
+
+
+        UsedProfile.SunPosition = Lightning.MainLight.transform.position;
+        UsedProfile.SunRotation = Lightning.MainLight.transform.rotation;
+        UsedProfile.SunColor = Lightning.MainLight.color;
+        UsedProfile.SunIntensity = Lightning.MainLight.intensity;
+
+
+        UsedProfile.Light1Position = Lightning.Spotlight1.transform.position;
+        UsedProfile.Light1Rotation = Lightning.Spotlight1.transform.rotation;
+        UsedProfile.Light1Color = Lightning.Spotlight1.color;
+        UsedProfile.Light1Intensity = Lightning.Spotlight1.intensity;
+        UsedProfile.Light1Range = Lightning.Spotlight1.range;
+        UsedProfile.Light1Type = Lightning.Spotlight1.type;
+
+        UsedProfile.Light2Position = Lightning.Spotlight2.transform.position;
+        UsedProfile.Light2Rotation = Lightning.Spotlight2.transform.rotation;
+        UsedProfile.Light2Color = Lightning.Spotlight2.color;
+        UsedProfile.Light2Intensity = Lightning.Spotlight2.intensity;
+        UsedProfile.Light2Range = Lightning.Spotlight2.range;
+        UsedProfile.Light2Type = Lightning.Spotlight2.type;
+
+        UsedProfile.Light3Position = Lightning.Spotlight3.transform.position;
+        UsedProfile.Light3Rotation = Lightning.Spotlight3.transform.rotation;
+        UsedProfile.Light3Color = Lightning.Spotlight3.color;
+        UsedProfile.Light3Intensity = Lightning.Spotlight3.intensity;
+        UsedProfile.Light3Range = Lightning.Spotlight3.range;
+        UsedProfile.Light3Type = Lightning.Spotlight3.type;
+
+
     }
 
     /// <summary>
     /// Loading the settings from a settings file (profile)
     /// </summary>
     public void LoadSettings() {
+
+        if (UsedProfile.Texture!=null) {
+            TextureToBlur = UsedProfile.Texture;
+        }
+
+
         MaxHeight = UsedProfile.MaxHeight;
         Invert = UsedProfile.Invert;
         Threshold = UsedProfile.Threshold;
@@ -435,6 +484,38 @@ public class TerrainGenerator : MonoBehaviour {
         ColorScaling = UsedProfile.ColorScaling;
         VisualisationMethod = UsedProfile.VisualisationMethod;
         BlurRotation = UsedProfile.BlurRotation;
+
+
+        Lightning.MainCamera.transform.position = UsedProfile.CameraPosition;
+        Lightning.MainCamera.transform.rotation = UsedProfile.CameraRotation;
+
+
+        Lightning.MainLight.transform.position = UsedProfile.SunPosition;
+        Lightning.MainLight.transform.rotation = UsedProfile.SunRotation;
+        Lightning.MainLight.color = UsedProfile.SunColor;
+        Lightning.MainLight.intensity = UsedProfile.SunIntensity;
+
+
+        Lightning.Spotlight1.transform.position = UsedProfile.Light1Position;
+        Lightning.Spotlight1.transform.rotation = UsedProfile.Light1Rotation;
+        Lightning.Spotlight1.color = UsedProfile.Light1Color;
+        Lightning.Spotlight1.intensity = UsedProfile.Light1Intensity;
+        Lightning.Spotlight1.range = UsedProfile.Light1Range;
+        Lightning.Spotlight1.type = UsedProfile.Light1Type;
+
+        Lightning.Spotlight2.transform.position = UsedProfile.Light2Position;
+        Lightning.Spotlight2.transform.rotation = UsedProfile.Light2Rotation;
+        Lightning.Spotlight2.color = UsedProfile.Light2Color;
+        Lightning.Spotlight2.intensity = UsedProfile.Light2Intensity;
+        Lightning.Spotlight2.range = UsedProfile.Light2Range;
+        Lightning.Spotlight2.type = UsedProfile.Light2Type;
+
+        Lightning.Spotlight3.transform.position = UsedProfile.Light3Position;
+        Lightning.Spotlight3.transform.rotation = UsedProfile.Light3Rotation;
+        Lightning.Spotlight3.color = UsedProfile.Light3Color;
+        Lightning.Spotlight3.intensity = UsedProfile.Light3Intensity;
+        Lightning.Spotlight3.range = UsedProfile.Light3Range;
+        Lightning.Spotlight3.type = UsedProfile.Light3Type;
     }
 
 

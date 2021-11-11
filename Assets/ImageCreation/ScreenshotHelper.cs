@@ -19,6 +19,10 @@ public class ScreenshotHelper : MonoBehaviour
 
     FirstPerson firstPerson;
 
+    public Vector3 CameraPosition;
+    public Vector3 CameraRotation;
+
+
     public void CaptureScreenshot() {
         string time = DateTime.Now.Day + "_" + DateTime.Now.Month + "_" + DateTime.Now.Year + "_" + DateTime.Now.Hour + "_" + DateTime.Now.Minute + "_" + DateTime.Now.Second +".png";
 
@@ -53,6 +57,10 @@ public class ScreenshotHelper : MonoBehaviour
         if (firstPerson==null) {
             firstPerson = FindObjectOfType<FirstPerson>();
         }
+
+        CameraPosition = target.position;
+        CameraRotation = target.rotation.eulerAngles;
+
         firstPerson.MoveCamera(target);
 
     }

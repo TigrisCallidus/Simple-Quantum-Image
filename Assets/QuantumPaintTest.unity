@@ -6404,7 +6404,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 1679991602}
+  m_Texture: {fileID: 1680897908}
   m_UVRect:
     serializedVersion: 2
     x: 0
@@ -8991,7 +8991,7 @@ MonoBehaviour:
   FileName: quantumPaint
   FolderName: Visuals
   logSize: 5
-  Text: {fileID: 4900000, guid: 5db8f916955904848bdf4d5bda9790f0, type: 3}
+  Text: {fileID: 4900000, guid: 37cb85531a774de46b069ebadb5b717c, type: 3}
   Vertical:
   - {fileID: 1387130864}
   - {fileID: 1874350083}
@@ -9593,7 +9593,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1656295129}
   m_CullTransparentMesh: 0
---- !u!28 &1679991602
+--- !u!28 &1680897908
 Texture2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

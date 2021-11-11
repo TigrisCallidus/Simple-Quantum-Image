@@ -62,7 +62,7 @@ public class ImageCreation : MonoBehaviour {
     public string FileName = "Teleport1";
 
     [Tooltip("The new image created by Blur or by Teleportation.")]
-    [HideInInspector]
+    //[HideInInspector]
     public Texture2D OutputTexture;
 
     [Tooltip("The image manipulation which will be applied.")]
@@ -81,7 +81,7 @@ public class ImageCreation : MonoBehaviour {
     public RawImage OutputImage;
 
 
-    public QuantumCircuit demoCircuit;
+    QuantumCircuit demoCircuit;
 
     /*
     private IEnumerator Start() {
@@ -123,7 +123,9 @@ public class ImageCreation : MonoBehaviour {
     /// </summary>
     public void CreateBlur() {
 
-        InputImage.texture = InputTexture1;
+        if (InputImage!=null) {
+            InputImage.texture = InputTexture1;
+        }
 
         //generating the quantum circuits encoding the color channels of the image
 
@@ -178,8 +180,10 @@ public class ImageCreation : MonoBehaviour {
 
         demoCircuit = red;
         OutputTexture = QuantumImageHelper.CalculateColorTexture(redData, greenData, blueData);
-
-        OutputImage.texture = OutputTexture;
+        OutputTexture.filterMode = FilterMode.Point;
+        if (OutputImage!=null) {
+            OutputImage.texture = OutputTexture;
+        }
     }
 
     public void ApplyGates() {
