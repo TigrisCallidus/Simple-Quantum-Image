@@ -210,8 +210,10 @@ namespace Qiskit {
             pow3 = MathHelper.IntegerPower2(numberOfQubits);
 
             pow1 += firstPow;
+            //micro optimization
+            end2 = pow2 + firstPow;
             for (int posi = firstPow; posi < pow1; posi++) {
-                end2 = pow2 + posi;
+                //end2 = pow2 + posi;
                 for (int posj = posi; posj < end2; posj += pow1Plus) {
                     end3 = pow3 + posj;
                     for (int posk = posj; posk < end3; posk += pow2Plus) {
@@ -224,6 +226,7 @@ namespace Qiskit {
 
                     }
                 }
+                end2++;
             }
         }
 

@@ -83,6 +83,11 @@ public class ImageCreation : MonoBehaviour {
 
     QuantumCircuit demoCircuit;
 
+
+    private void Start() {
+        FastTeleport();
+    }
+
     /*
     private IEnumerator Start() {
         Application.targetFrameRate = 30;
@@ -265,6 +270,7 @@ public class ImageCreation : MonoBehaviour {
 
         InputImage.texture = InputTexture1;
         InputImage2.texture = InputTexture2;
+        simulator = new MicroQiskitSimulator();
         OutputTexture = TeleportTexturesColoredPartByPartOptimized(InputTexture1, InputTexture2, TeleportPercentage);
 /*
         switch (UsedTeleportationMode) {
@@ -423,11 +429,15 @@ public class ImageCreation : MonoBehaviour {
         return single;
     }
 
-    public static void CalculatePartialTraceInPlace(QuantumCircuit combined, double[] trace, ref ComplexNumber[] amplitudes, double normalization = 1) {
-        int halfQubits = combined.NumberOfQubits / 2;
+    static MicroQiskitSimulator simulator;
+
+
+    public static void CalculatePartialTraceInPlace(QuantumCircuit combined, double[] trace, ref ComplexNumber[] amplitudes, int amplitudeLength, double normalization = 1) {
+        //int halfQubits = combined.NumberOfQubits / 2;
         //int amplitudeLength = MathHelper.IntegerPower(2, halfQubits);
-        int amplitudeLength = MathHelper.IntegerPower2(halfQubits);
-        MicroQiskitSimulator simulator = new MicroQiskitSimulator();
+        //int amplitudeLength = MathHelper.IntegerPower2(halfQubits);
+        //int amplitudeLength = amplitudes.Length;
+        //Debug.Log(amplitudes.Length + " " + combined.NumberOfQubits);
         //combined.Amplitudes = simulator.SimulateInPlace(combined,ref amplitudes );
         simulator.SimulateInPlace(combined, ref amplitudes);
         //float[] single = new float[amplitudeLength];
@@ -695,11 +705,13 @@ public class ImageCreation : MonoBehaviour {
 
         //int amplitudeLength = MathHelper.IntegerPower(2, numberOfQubits);
         int amplitudeLength = MathHelper.IntegerPower2(numberOfQubits);
+        int amplitudeLength2 = MathHelper.IntegerPower2(2*numberOfQubits);
+        Debug.Log(numberOfQubits + " " + amplitudeLength);
 
         redProbs = new double[amplitudeLength];
         greenProbs = new double[amplitudeLength];
         blueProbs = new double[amplitudeLength];
-        amplitudes = new ComplexNumber[amplitudeLength];
+        amplitudes = new ComplexNumber[amplitudeLength2];
 
         Color32[] image1Colors = inputTexture.GetPixels32();
         Color32[] image2Colors = inputTexture2.GetPixels32();
@@ -743,7 +755,7 @@ public class ImageCreation : MonoBehaviour {
                 //ApplyTeleport(combinedCircuit, mixture);
 
                 //redProbs = PartialTrace(combineRed, redNormalization);
-                CalculatePartialTraceInPlace(combinedCircuit, redProbs, ref amplitudes, redNormalization);
+                CalculatePartialTraceInPlace(combinedCircuit, redProbs, ref amplitudes, amplitudeLength, redNormalization);
 
 
 
@@ -780,7 +792,7 @@ public class ImageCreation : MonoBehaviour {
                 //ApplyTeleport(combinedCircuit, mixture);
 
                 //greenProbs = PartialTrace(combinedGreen, greenNormalisation);
-                CalculatePartialTraceInPlace(combinedCircuit, greenProbs, ref amplitudes, greenNormalisation);
+                CalculatePartialTraceInPlace(combinedCircuit, greenProbs, ref amplitudes, amplitudeLength, greenNormalisation);
 
                 //max1 = QuantumImageHelper.FillPartialHeightArray(inputTexture, blueImageData, ColorChannel.B, startX, startY, dimX, dimY);
                 //max2 = QuantumImageHelper.FillPartialHeightArray(inputTexture2, blueImageData2, ColorChannel.B, startX, startY, dimX, dimY);
@@ -815,7 +827,7 @@ public class ImageCreation : MonoBehaviour {
                 //ApplyTeleport(combinedCircuit, mixture);
 
                 //blueProbs = PartialTrace(combinedBluen, blueNormalisation);
-                CalculatePartialTraceInPlace(combinedCircuit, blueProbs, ref amplitudes, blueNormalisation);
+                CalculatePartialTraceInPlace(combinedCircuit, blueProbs, ref amplitudes, amplitudeLength, blueNormalisation);
 
                 if (UseSimpleEncoding) {
                     //redData = QuantumImageHelper.ProbabilitiesToImage(redProbs, dimX, dimY);
@@ -1491,7 +1503,7 @@ public class ImageCreation : MonoBehaviour {
                 //ApplyTeleport(combinedCircuit, mixture);
 
                 //redProbs = PartialTrace(combineRed, redNormalization);
-                CalculatePartialTraceInPlace(combinedCircuit, redProbs, ref amplitudes, redNormalization);
+                CalculatePartialTraceInPlace(combinedCircuit, redProbs, ref amplitudes, amplitudeLength, redNormalization);
 
 
 
@@ -1527,7 +1539,7 @@ public class ImageCreation : MonoBehaviour {
                 //ApplyTeleport(combinedCircuit, mixture);
 
                 //greenProbs = PartialTrace(combinedGreen, greenNormalisation);
-                CalculatePartialTraceInPlace(combinedCircuit, greenProbs, ref amplitudes, greenNormalisation);
+                CalculatePartialTraceInPlace(combinedCircuit, greenProbs, ref amplitudes, amplitudeLength, greenNormalisation);
 
                 //max1 = QuantumImageHelper.FillPartialHeightArray(inputTexture, blueImageData, ColorChannel.B, startX, startY, dimX, dimY);
                 //max2 = QuantumImageHelper.FillPartialHeightArray(inputTexture2, blueImageData2, ColorChannel.B, startX, startY, dimX, dimY);
@@ -1561,7 +1573,7 @@ public class ImageCreation : MonoBehaviour {
                 //ApplyTeleport(combinedCircuit, mixture);
 
                 //blueProbs = PartialTrace(combinedBluen, blueNormalisation);
-                CalculatePartialTraceInPlace(combinedCircuit, blueProbs, ref amplitudes, blueNormalisation);
+                CalculatePartialTraceInPlace(combinedCircuit, blueProbs, ref amplitudes, amplitudeLength, blueNormalisation);
 
                 if (UseSimpleEncoding) {
                     //redData = QuantumImageHelper.ProbabilitiesToImage(redProbs, dimX, dimY);

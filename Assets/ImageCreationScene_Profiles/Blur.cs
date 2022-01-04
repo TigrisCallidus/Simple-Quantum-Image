@@ -1,7 +1,7 @@
 ﻿
 
 using System;
-
+#if UNITY_POST_PROCESSING_STACK_V2
 namespace UnityEngine.Rendering.PostProcessing
 {
     [Serializable]
@@ -87,3 +87,5 @@ namespace UnityEngine.Rendering.PostProcessing
         }
     }
 }
+
+#endif
