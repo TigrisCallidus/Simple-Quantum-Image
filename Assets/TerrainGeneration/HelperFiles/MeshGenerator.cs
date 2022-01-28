@@ -432,6 +432,12 @@ public static class MeshGenerator {
         List<Vector3> vertices = new List<Vector3>();
         List<int> triangles = new List<int>();
 
+        List<Vector2> uv = new List<Vector2>();
+
+        float scaleX = 1.0f / data.X;
+        float scaleY = 1.0f / data.Y;
+        float scaleZ = 1.0f / data.Z;
+
         //Needed for marching cubes
         MarchingCubesHelper.GenerateAdvancedData();
 
@@ -440,7 +446,10 @@ public static class MeshGenerator {
             for (int k = 1; k < dimensionZ; k++) {
                 posZ = midPosition.z - depth / 2 * dimensionY;
                 for (int j = 1; j < dimensionY; j++) {
-                    addMarchingCubeOptimized(vertices, triangles, posX, posY, posZ,
+
+
+
+                    int vertexCount=addMarchingCubeOptimized(vertices, triangles, posX, posY, posZ,
                     width, height, depth,
                     data[i - 1, j - 1, k - 1].Value > threshold && !(i == 1 || j == 1 || k == 1),
                     data[i - 1, j, k - 1].Value > threshold && !(i == 1 || j >= dimensionY - 1 || k == 1),
@@ -451,6 +460,11 @@ public static class MeshGenerator {
                     data[i, j, k].Value > threshold && !(i >= dimensionX - 1 || j >= dimensionY - 1 || k >= dimensionZ - 1),
                     data[i, j - 1, k].Value > threshold && !(i >= dimensionX - 1 || j == 1 || k >= dimensionZ - 1)
                     );
+
+                    Vector2 uvPos = new Vector2(scaleX * i, scaleY * j);
+                    for (int c = 0; c < vertexCount; c++) {
+                        uv.Add(uvPos);
+                    }
 
                     posZ += depth;
                 }
@@ -464,7 +478,7 @@ public static class MeshGenerator {
 
         returnValue.vertices = vertices.ToArray();
         returnValue.triangles = triangles.ToArray();
-
+        returnValue.uv = uv.ToArray();
         returnValue.RecalculateNormals();
         //DONT EVER DO THAT it takes sooooo long!
         //returnValue.Optimize();
@@ -568,6 +582,13 @@ public static class MeshGenerator {
         List<Color> colors = new List<Color>();
         List<int> triangles = new List<int>();
 
+        List<Vector2> uv = new List<Vector2>();
+
+        float scaleX = 1.0f / data.X;
+        float scaleY = 1.0f / data.Y;
+        float scaleZ = 1.0f / data.Z;
+
+
         //Needed for marching cubes
         MarchingCubesHelper.GenerateAdvancedData();
 
@@ -577,7 +598,7 @@ public static class MeshGenerator {
             for (int k = 1; k < dimensionZ; k++) {
                 posZ = midPosition.z - depth / 2 * dimensionY;
                 for (int j = 1; j < dimensionY; j++) {
-                    addMarchingCubeOptimized(vertices, triangles, colors, posX, posY, posZ,
+                    int vertexCount= addMarchingCubeOptimized(vertices, triangles, colors, posX, posY, posZ,
                         width, height, depth, color, threshold,
                         data[i - 1, j - 1, k - 1].Value > threshold && !(i == 1 || j == 1 || k == 1),
                         data[i - 1, j, k - 1].Value > threshold && !(i == 1 || j >= dimensionY - 1 || k == 1),
@@ -596,6 +617,10 @@ public static class MeshGenerator {
                         data[i, j, k].Value,
                         data[i, j - 1, k].Value
                         );
+                    Vector2 uvPos = new Vector2(scaleX * i, scaleY * j);
+                    for (int c = 0; c < vertexCount; c++) {
+                        uv.Add(uvPos);
+                    }
 
                     posZ += depth;
                 }
@@ -610,6 +635,7 @@ public static class MeshGenerator {
         returnValue.vertices = vertices.ToArray();
         returnValue.triangles = triangles.ToArray();
         returnValue.colors = colors.ToArray();
+        returnValue.uv = uv.ToArray();
 
         returnValue.RecalculateNormals();
         //DONT EVER DO THAT it takes sooooo long!
@@ -640,8 +666,8 @@ public static class MeshGenerator {
 
         //Preparing the arrays to be filled
         Vector3[] vertices = new Vector3[dimX * dimY];
-        Vector2[] uv = new Vector2[dimX * dimY];
         Vector2[] uv2 = new Vector2[dimX * dimY];
+        Vector2[] uv = new Vector2[dimX * dimY];
         int[] triangles = new int[(dimX - 1) * (dimY - 1) * 2 * 3];
 
         // starting position of grid, such that it is centered in 0,0,0
@@ -668,8 +694,9 @@ public static class MeshGenerator {
             for (int j = 0; j < dimY; j++) {
                 // new vertex at the current position with the desired height.
                 vertices[count] = new Vector3(posX, data[i, j].Value * heightScaling, posY);
-                uv[count] = new Vector2(i % 2, j % 2);
-                uv2[count] = new Vector2(uvX, uvY);
+                //Setting here uv2 to repeating 0,1 and uv to go from 0 to 1 over the whole mesh
+                uv[count] = new Vector2(uvX, uvY);
+                uv2[count] = new Vector2(i % 2, j % 2);
 
                 if (i > 0 && j > 0) {
                     //Except for the first row and column (ince they have no neighbours on the left or bottom), whenever a new vertex is placed, 
@@ -689,6 +716,7 @@ public static class MeshGenerator {
         //setting the values
         returnValue.vertices = vertices;
         returnValue.triangles = triangles;
+        
         returnValue.uv = uv;
         returnValue.uv2 = uv2;
         //we did not set the normals, we let unity do this for us.
@@ -1239,7 +1267,7 @@ public static class MeshGenerator {
 
 
     // simple version adding vertixes always on the same space.
-    static void addMarchingCubeOptimized(List<Vector3> vertices, List<int> triangles,
+    static int addMarchingCubeOptimized(List<Vector3> vertices, List<int> triangles,
         float midX, float midY, float midZ,
         float width, float height, float depth,
         bool in0, bool in1, bool in2, bool in3,
@@ -1269,7 +1297,7 @@ public static class MeshGenerator {
         int tricount = MarchingCubesHelper.triangleCounts[cubeIndex];
 
         if (tricount == 0) {
-            return;
+            return 0;
         }
 
         int vertCount = vertices.Count;
@@ -1288,6 +1316,7 @@ public static class MeshGenerator {
         float yTop = midY + halfHeight;
         float zBack = midZ + halfDepth;
 
+        int returnValue = 0;
 
 
         //We add now only the vertices which are needed.
@@ -1295,45 +1324,57 @@ public static class MeshGenerator {
         //bottom square
         if (MarchingCubesHelper.vertexNeeded[cubeIndex, 0]) {
             vertices.Add(new Vector3(xLeft, yBot, midZ));
+            returnValue++;
         }
         if (MarchingCubesHelper.vertexNeeded[cubeIndex, 1]) {
             vertices.Add(new Vector3(midX, yBot, zBack));
+            returnValue++;
         }
         if (MarchingCubesHelper.vertexNeeded[cubeIndex, 2]) {
             vertices.Add(new Vector3(xRight, yBot, midZ));
+            returnValue++;
         }
         if (MarchingCubesHelper.vertexNeeded[cubeIndex, 3]) {
             vertices.Add(new Vector3(midX, yBot, zFront));
+            returnValue++;
         }
 
 
         //top square
         if (MarchingCubesHelper.vertexNeeded[cubeIndex, 4]) {
             vertices.Add(new Vector3(xLeft, yTop, midZ));
+            returnValue++;
         }
         if (MarchingCubesHelper.vertexNeeded[cubeIndex, 5]) {
             vertices.Add(new Vector3(midX, yTop, zBack));
+            returnValue++;
         }
         if (MarchingCubesHelper.vertexNeeded[cubeIndex, 6]) {
             vertices.Add(new Vector3(xRight, yTop, midZ));
+            returnValue++;
         }
         if (MarchingCubesHelper.vertexNeeded[cubeIndex, 7]) {
             vertices.Add(new Vector3(midX, yTop, zFront));
+            returnValue++;
         }
 
 
         //middle square
         if (MarchingCubesHelper.vertexNeeded[cubeIndex, 8]) {
             vertices.Add(new Vector3(xLeft, midY, zFront));
+            returnValue++;
         }
         if (MarchingCubesHelper.vertexNeeded[cubeIndex, 9]) {
             vertices.Add(new Vector3(xLeft, midY, zBack));
+            returnValue++;
         }
         if (MarchingCubesHelper.vertexNeeded[cubeIndex, 10]) {
             vertices.Add(new Vector3(xRight, midY, zBack));
+            returnValue++;
         }
         if (MarchingCubesHelper.vertexNeeded[cubeIndex, 11]) {
             vertices.Add(new Vector3(xRight, midY, zFront));
+            returnValue++;
         }
 
         //always only the triangles needed
@@ -1344,11 +1385,12 @@ public static class MeshGenerator {
             triangles.Add(vertCount + MarchingCubesHelper.actualVertexNumber[cubeIndex, i]);
         }
 
+        return returnValue;
     }
 
 
 
-    static void addMarchingCubeOptimized(List<Vector3> vertices, List<int> triangles, List<Color> colors,
+    static int addMarchingCubeOptimized(List<Vector3> vertices, List<int> triangles, List<Color> colors,
         float midX, float midY, float midZ,
         float width, float height, float depth, Color color, float threshold,
         bool in0, bool in1, bool in2, bool in3,
@@ -1381,8 +1423,10 @@ public static class MeshGenerator {
         int tricount = MarchingCubesHelper.triangleCounts[cubeIndex];
 
         if (tricount == 0) {
-            return;
+            return 0;
         }
+
+        int returnValue = 0;
 
         int vertCount = vertices.Count;
 
@@ -1414,6 +1458,7 @@ public static class MeshGenerator {
     val0, val1, threshold,
     out posX, out posY, out posZ);
             vertices.Add(new Vector3(posX, posY, posZ));
+            returnValue++;
         }
         if (MarchingCubesHelper.vertexNeeded[cubeIndex, 1]) {
             colors.Add(color);
@@ -1422,6 +1467,7 @@ public static class MeshGenerator {
     val1, val2, threshold,
     out posX, out posY, out posZ);
             vertices.Add(new Vector3(posX, posY, posZ));
+            returnValue++;
         }
         if (MarchingCubesHelper.vertexNeeded[cubeIndex, 2]) {
             colors.Add(color);
@@ -1430,6 +1476,7 @@ public static class MeshGenerator {
     val2, val3, threshold,
     out posX, out posY, out posZ);
             vertices.Add(new Vector3(posX, posY, posZ));
+            returnValue++;
         }
         if (MarchingCubesHelper.vertexNeeded[cubeIndex, 3]) {
             colors.Add(color);
@@ -1438,6 +1485,7 @@ public static class MeshGenerator {
     val3, val0, threshold,
     out posX, out posY, out posZ);
             vertices.Add(new Vector3(posX, posY, posZ));
+            returnValue++;
         }
 
 
@@ -1449,6 +1497,7 @@ public static class MeshGenerator {
     val4, val5, threshold,
     out posX, out posY, out posZ);
             vertices.Add(new Vector3(posX, posY, posZ));
+            returnValue++;
         }
         if (MarchingCubesHelper.vertexNeeded[cubeIndex, 5]) {
             colors.Add(color);
@@ -1457,6 +1506,7 @@ public static class MeshGenerator {
     val5, val6, threshold,
     out posX, out posY, out posZ);
             vertices.Add(new Vector3(posX, posY, posZ));
+            returnValue++;
         }
         if (MarchingCubesHelper.vertexNeeded[cubeIndex, 6]) {
             colors.Add(color);
@@ -1465,6 +1515,7 @@ public static class MeshGenerator {
     val6, val7, threshold,
     out posX, out posY, out posZ);
             vertices.Add(new Vector3(posX, posY, posZ));
+            returnValue++;
         }
         if (MarchingCubesHelper.vertexNeeded[cubeIndex, 7]) {
             colors.Add(color);
@@ -1473,6 +1524,7 @@ public static class MeshGenerator {
     val7, val4, threshold,
     out posX, out posY, out posZ);
             vertices.Add(new Vector3(posX, posY, posZ));
+            returnValue++;
         }
 
 
@@ -1484,6 +1536,7 @@ public static class MeshGenerator {
     val0, val4, threshold,
     out posX, out posY, out posZ);
             vertices.Add(new Vector3(posX, posY, posZ));
+            returnValue++;
         }
         if (MarchingCubesHelper.vertexNeeded[cubeIndex, 9]) {
             colors.Add(color);
@@ -1492,6 +1545,7 @@ public static class MeshGenerator {
     val1, val5, threshold,
     out posX, out posY, out posZ);
             vertices.Add(new Vector3(posX, posY, posZ));
+            returnValue++;
         }
         if (MarchingCubesHelper.vertexNeeded[cubeIndex, 10]) {
             colors.Add(color);
@@ -1500,6 +1554,7 @@ public static class MeshGenerator {
     val2, val6, threshold,
     out posX, out posY, out posZ);
             vertices.Add(new Vector3(posX, posY, posZ));
+            returnValue++;
         }
         if (MarchingCubesHelper.vertexNeeded[cubeIndex, 11]) {
             colors.Add(color);
@@ -1508,6 +1563,7 @@ public static class MeshGenerator {
     val3, val7, threshold,
     out posX, out posY, out posZ);
             vertices.Add(new Vector3(posX, posY, posZ));
+            returnValue++;
         }
 
         //always only the triangles needed
@@ -1517,6 +1573,7 @@ public static class MeshGenerator {
             triangles.Add(vertCount + MarchingCubesHelper.actualVertexNumber[cubeIndex, i]);
         }
 
+        return returnValue;
     }
 
 

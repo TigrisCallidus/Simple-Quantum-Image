@@ -21,11 +21,24 @@ public class TerrainGeneratorEditor : Editor {
 
     TerrainGenerator targetScript;
 
+    SerializedProperty fileName;
+    SerializedProperty generatedMesh;
+    SerializedProperty usedProfile;
+    SerializedProperty jsonFileName;
+
+
     void OnEnable() {
         targetScript = target as TerrainGenerator;
+
+        fileName = serializedObject.FindProperty("MeshName");
+        generatedMesh = serializedObject.FindProperty("GeneratedMesh");
+        usedProfile = serializedObject.FindProperty("UsedProfile");
+        jsonFileName = serializedObject.FindProperty("JsonFileName");
     }
 
     public override void OnInspectorGUI() {
+
+
 
         // Let the default inspecter draw all the values
         DrawDefaultInspector();
@@ -35,9 +48,9 @@ public class TerrainGeneratorEditor : Editor {
         if (GUILayout.Button("Apply Blur effect to the Texture to Blur")) {
             targetScript.ApplyBlur();
         }
-        
+
         //if (GUILayout.Button("Apply your own effect to the Texture to Blur")) {
-            //targetScript.ApplyYourOwnEffect();
+        //targetScript.ApplyYourOwnEffect();
         //}
 
         /*
@@ -60,27 +73,55 @@ public class TerrainGeneratorEditor : Editor {
             targetScript.ColorMesh();
         }
 
-        if (GUILayout.Button("Save the terrain as a mesh")) {
-            AssetDatabase.CreateAsset(targetScript.GeneratedMesh, targetScript.GenerateSavePath());
-            AssetDatabase.SaveAssets();
-        }
+        GUILayout.BeginHorizontal();
+        GUILayout.Label("Show Advanced Setting", GUILayout.Width(145));
+        targetScript.showAdvanced = EditorGUILayout.Toggle(targetScript.showAdvanced);
+        GUILayout.EndHorizontal();
 
-        if (GUILayout.Button("Save settings to local settings file")) {
-            targetScript.SaveSettings();
-        }
-
-        if (GUILayout.Button("Load settings from local settings file")) {
-            targetScript.LoadSettings();
-        }
+        if (targetScript.showAdvanced) {
 
 
-        if (GUILayout.Button("Export settings to json")) {
-            targetScript.ExportSettingsFile();
-            AssetDatabase.Refresh();
-        }
+            EditorGUILayout.PropertyField(generatedMesh, new GUIContent("GeneratedMesh : "));
 
-        if (GUILayout.Button("Import settings from json")) {
-            targetScript.ImportSettingsFile();
+
+
+
+
+
+            //Todo do it using a better fitting object
+            //EditorGUILayout.LabelField("Handling Saving and Loading");
+
+            EditorGUILayout.PropertyField(fileName, new GUIContent("Mesh Name : "));
+
+
+            if (GUILayout.Button("Save the terrain as a mesh")) {
+                AssetDatabase.CreateAsset(targetScript.GeneratedMesh, targetScript.GenerateSavePath());
+                AssetDatabase.SaveAssets();
+            }
+
+            EditorGUILayout.PropertyField(usedProfile, new GUIContent("UsedProfile : "));
+
+            if (GUILayout.Button("Save settings to local settings file")) {
+                targetScript.SaveSettings();
+            }
+
+            if (GUILayout.Button("Load settings from local settings file")) {
+                targetScript.LoadSettings();
+            }
+
+            EditorGUILayout.PropertyField(jsonFileName, new GUIContent("JsonFileName : "));
+
+            if (GUILayout.Button("Export settings to json")) {
+                targetScript.ExportSettingsFile();
+                AssetDatabase.Refresh();
+            }
+
+            if (GUILayout.Button("Import settings from json")) {
+                targetScript.ImportSettingsFile();
+            }
+
+            // Apply changes to the serializedProperty - always do this in the end of OnInspectorGUI.
+            serializedObject.ApplyModifiedProperties();
         }
 
     }

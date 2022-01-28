@@ -1,4 +1,4 @@
-﻿Shader "Custom/SurfaceVertColor"
+﻿Shader "Custom/SurfaceVertColorScaled"
 {
     Properties
     {

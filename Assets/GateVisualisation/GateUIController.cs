@@ -157,7 +157,7 @@ public class GateUIController : MonoBehaviour {
     }
 
     public void GenerateTerrain() {
-        Generator.InputTexture = ImageCreator.OutputTexture;
+        Generator.BlurredTexture = ImageCreator.OutputTexture;
         Generator.Generate2DData();
         Generator.Generate3DDataFrom2DData();
         Generator.GenerateMesh();
