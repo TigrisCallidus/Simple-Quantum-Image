@@ -263,6 +263,66 @@ public static class MeshGenerator {
 
     }
 
+
+
+    /// <summary>
+    /// Creating several simple cubes (in the same mesh) with some (unneeded) faces removed.
+    /// Smoothens mesh by reusing vertices
+    /// </summary>
+    /// <param name="centerPositions">the centers of the cubes in the mesh</param>
+    /// <param name="removeFace">the faces which should be removed (array with 6 bools per cube)</param>
+    /// <param name="size">size of the cubes (X,Y,Z)</param>
+    /// <returns>The mesh consisting of the cubes (without the removed faces)</returns>
+    /// Made for easier use (with size vectors)
+    public static Mesh GetCubesSmooth(List<Vector3> centerPositions, List<bool[]> removeFace, Vector3 size, Vector2 minUV, Vector2 maxUV) {
+        return GetCubesSmooth(centerPositions, removeFace, size.x, size.y, size.z, minUV, maxUV);
+    }
+
+    /// <summary>
+    /// Creating several simple cubes (in the same mesh) with some (unneeded) faces removed.
+    /// Smoothens mesh by reusing vertices
+    /// </summary>
+    /// Creating several simple cubes (in the same mesh) with some (unneeded) faces removed.
+    /// <param name="removeFace">the faces which should be removed (array with 6 bools per cube)</param>
+    /// <param name="width">size of the cubes in X dimension</param>
+    /// <param name="height">size of the cubes in X dimension</param>
+    /// <param name="depth">size of the cubes in X dimension</param>
+    /// <returns>The mesh consisting of the cubes (without the removed faces)</returns>
+    public static Mesh GetCubesSmooth(List<Vector3> centerPositions, List<bool[]> removeFace, float width, float height, float depth, Vector2 minUV, Vector2 maxUV) {
+        Mesh returnValue = new Mesh();
+        returnValue.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
+        returnValue.name = "Cubes optimized";
+        if (centerPositions.Count != removeFace.Count) {
+            Debug.LogError(" dimension mismatch between positions and removeFace" + centerPositions.Count + " vs " + removeFace.Count);
+        }
+
+        List<Vector3> vertices = new List<Vector3>();
+        List<int> triangles = new List<int>();
+        List<Vector3> normals = new List<Vector3>();
+        List<Vector2> uv = new List<Vector2>();
+
+        Dictionary<Vector4, int> vertexDictionary = new Dictionary<Vector4, int>();
+
+
+        for (int i = 0; i < centerPositions.Count; i++) {
+
+            addCube(vertices, vertexDictionary, triangles, normals, uv, removeFace[i],
+                centerPositions[i].x, centerPositions[i].y, centerPositions[i].z,
+                width, height, depth,
+                minUV, maxUV);
+        }
+
+        returnValue.vertices = vertices.ToArray();
+        returnValue.triangles = triangles.ToArray();
+        returnValue.normals = normals.ToArray();
+        //TODO add alternating uvs again
+        returnValue.uv = uv.ToArray();
+        //returnValue.Optimize();
+        return returnValue;
+
+    }
+
+
     /// <summary>
     /// Creating several simple colored cubes (in the same mesh) with some (unneeded) faces removed.
     /// </summary>
@@ -449,7 +509,85 @@ public static class MeshGenerator {
 
 
 
-                    int vertexCount=addMarchingCubeOptimized(vertices, triangles, posX, posY, posZ,
+                    int vertexCount = addMarchingCubeOptimized(vertices, triangles, posX, posY, posZ,
+                    width, height, depth,
+                    data[i - 1, j - 1, k - 1].Value > threshold && !(i == 1 || j == 1 || k == 1),
+                    data[i - 1, j, k - 1].Value > threshold && !(i == 1 || j >= dimensionY - 1 || k == 1),
+                    data[i, j, k - 1].Value > threshold && !(i >= dimensionX - 1 || j >= dimensionY - 1 || k == 1),
+                    data[i, j - 1, k - 1].Value > threshold && !(i >= dimensionX - 1 || j == 1 || k == 1),
+                    data[i - 1, j - 1, k].Value > threshold && !(i == 1 || j == 1 || k >= dimensionZ - 1),
+                    data[i - 1, j, k].Value > threshold && !(i == 1 || j >= dimensionY - 1 || k >= dimensionZ - 1),
+                    data[i, j, k].Value > threshold && !(i >= dimensionX - 1 || j >= dimensionY - 1 || k >= dimensionZ - 1),
+                    data[i, j - 1, k].Value > threshold && !(i >= dimensionX - 1 || j == 1 || k >= dimensionZ - 1)
+                    );
+
+                    Vector2 uvPos = new Vector2(scaleX * i, scaleY * j);
+                    for (int c = 0; c < vertexCount; c++) {
+                        uv.Add(uvPos);
+                    }
+
+                    posZ += depth;
+                }
+                posY += height;
+            }
+            posX += width;
+        }
+
+        Debug.Log(posX + " " + posY + " " + posZ);
+
+
+        returnValue.vertices = vertices.ToArray();
+        returnValue.triangles = triangles.ToArray();
+        returnValue.uv = uv.ToArray();
+        returnValue.RecalculateNormals();
+        //DONT EVER DO THAT it takes sooooo long!
+        //returnValue.Optimize();
+
+        return returnValue;
+    }
+
+
+    public static Mesh ConstructMarchingCubesYZSwitchedSmooth(Data3D data, Vector3 midPosition, float threshold = 0.5f, float width = 1, float height = 1, float depth = 1) {
+        Mesh returnValue = new Mesh();
+        returnValue.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
+        returnValue.name = "Marching Cubes advanced Smooth";
+
+        //TODO make UV smoother! (per vertex from vertex position not just square position)
+
+        int dimensionX = data.X;
+        int dimensionY = data.Y;
+        int dimensionZ = data.Z;
+
+        float posX = midPosition.x - width / 2 * dimensionX;
+        float posY = midPosition.y - height / 2 * dimensionZ;
+        float posZ = midPosition.z - depth / 2 * dimensionY;
+
+        Debug.Log(posX + " " + posY + " " + posZ);
+
+
+        List<Vector3> vertices = new List<Vector3>();
+        List<int> triangles = new List<int>();
+
+        List<Vector2> uv = new List<Vector2>();
+
+        float scaleX = 1.0f / data.X;
+        float scaleY = 1.0f / data.Y;
+        float scaleZ = 1.0f / data.Z;
+
+        //Needed for marching cubes
+        MarchingCubesHelper.GenerateAdvancedData();
+
+        Dictionary<Vector3, int> vertexDictionary = new Dictionary<Vector3, int>();
+
+        for (int i = 1; i < dimensionX; i++) {
+            posY = midPosition.y - height / 2 * dimensionZ;
+            for (int k = 1; k < dimensionZ; k++) {
+                posZ = midPosition.z - depth / 2 * dimensionY;
+                for (int j = 1; j < dimensionY; j++) {
+
+
+
+                    int vertexCount = addMarchingCubeOptimizedSmooth(vertices, triangles, vertexDictionary, posX, posY, posZ,
                     width, height, depth,
                     data[i - 1, j - 1, k - 1].Value > threshold && !(i == 1 || j == 1 || k == 1),
                     data[i - 1, j, k - 1].Value > threshold && !(i == 1 || j >= dimensionY - 1 || k == 1),
@@ -598,7 +736,94 @@ public static class MeshGenerator {
             for (int k = 1; k < dimensionZ; k++) {
                 posZ = midPosition.z - depth / 2 * dimensionY;
                 for (int j = 1; j < dimensionY; j++) {
-                    int vertexCount= addMarchingCubeOptimized(vertices, triangles, colors, posX, posY, posZ,
+                    int vertexCount = addMarchingCubeOptimized(vertices, triangles, colors, posX, posY, posZ,
+                        width, height, depth, color, threshold,
+                        data[i - 1, j - 1, k - 1].Value > threshold && !(i == 1 || j == 1 || k == 1),
+                        data[i - 1, j, k - 1].Value > threshold && !(i == 1 || j >= dimensionY - 1 || k == 1),
+                        data[i, j, k - 1].Value > threshold && !(i >= dimensionX - 1 || j >= dimensionY - 1 || k == 1),
+                        data[i, j - 1, k - 1].Value > threshold && !(i >= dimensionX - 1 || j == 1 || k == 1),
+                        data[i - 1, j - 1, k].Value > threshold && !(i == 1 || j == 1 || k >= dimensionZ - 1),
+                        data[i - 1, j, k].Value > threshold && !(i == 1 || j >= dimensionY - 1 || k >= dimensionZ - 1),
+                        data[i, j, k].Value > threshold && !(i >= dimensionX - 1 || j >= dimensionY - 1 || k >= dimensionZ - 1),
+                        data[i, j - 1, k].Value > threshold && !(i >= dimensionX - 1 || j == 1 || k >= dimensionZ - 1),
+                        data[i - 1, j - 1, k - 1].Value,
+                        data[i - 1, j, k - 1].Value,
+                        data[i, j, k - 1].Value,
+                        data[i, j - 1, k - 1].Value,
+                        data[i - 1, j - 1, k].Value,
+                        data[i - 1, j, k].Value,
+                        data[i, j, k].Value,
+                        data[i, j - 1, k].Value
+                        );
+                    Vector2 uvPos = new Vector2(scaleX * i, scaleY * j);
+                    for (int c = 0; c < vertexCount; c++) {
+                        uv.Add(uvPos);
+                    }
+
+                    posZ += depth;
+                }
+                posY += height;
+            }
+            posX += width;
+        }
+
+        Debug.Log(posX + " " + posY + " " + posZ);
+
+
+        returnValue.vertices = vertices.ToArray();
+        returnValue.triangles = triangles.ToArray();
+        returnValue.colors = colors.ToArray();
+        returnValue.uv = uv.ToArray();
+
+        returnValue.RecalculateNormals();
+        //DONT EVER DO THAT it takes sooooo long!
+        //returnValue.Optimize();
+
+        return returnValue;
+    }
+
+
+    public static Mesh ConstructMarchingCubesYZSwitchedSmooth(Data3D data, Vector3 midPosition, Color color, float threshold = 0.5f, float width = 1, float height = 1, float depth = 1) {
+        Mesh returnValue = new Mesh();
+        returnValue.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
+        returnValue.name = "Marching Cubes Advanced";
+
+
+
+        int dimensionX = data.X;
+        int dimensionY = data.Y;
+        int dimensionZ = data.Z;
+
+        float posX = midPosition.x - width / 2 * dimensionX;
+        float posY = midPosition.y - height / 2 * dimensionY;
+        float posZ = midPosition.z - depth / 2 * dimensionZ;
+
+        Debug.Log(posX + " " + posY + " " + posZ);
+
+
+        List<Vector3> vertices = new List<Vector3>();
+        List<Color> colors = new List<Color>();
+        List<int> triangles = new List<int>();
+
+        List<Vector2> uv = new List<Vector2>();
+
+        float scaleX = 1.0f / data.X;
+        float scaleY = 1.0f / data.Y;
+        float scaleZ = 1.0f / data.Z;
+
+
+        //Needed for marching cubes
+        MarchingCubesHelper.GenerateAdvancedData();
+
+        Dictionary<Vector3, int> vertexDictionary = new Dictionary<Vector3, int>();
+
+
+        for (int i = 1; i < dimensionX; i++) {
+            posY = midPosition.y - height / 2 * dimensionZ;
+            for (int k = 1; k < dimensionZ; k++) {
+                posZ = midPosition.z - depth / 2 * dimensionY;
+                for (int j = 1; j < dimensionY; j++) {
+                    int vertexCount = addMarchingCubeOptimizedSmooth(vertices, triangles, vertexDictionary, colors, posX, posY, posZ,
                         width, height, depth, color, threshold,
                         data[i - 1, j - 1, k - 1].Value > threshold && !(i == 1 || j == 1 || k == 1),
                         data[i - 1, j, k - 1].Value > threshold && !(i == 1 || j >= dimensionY - 1 || k == 1),
@@ -716,7 +941,7 @@ public static class MeshGenerator {
         //setting the values
         returnValue.vertices = vertices;
         returnValue.triangles = triangles;
-        
+
         returnValue.uv = uv;
         returnValue.uv2 = uv2;
         //we did not set the normals, we let unity do this for us.
@@ -811,6 +1036,109 @@ public static class MeshGenerator {
 
         connectQuadTriangles(triangles, pos, pos1, pos2, pos3);
     }
+
+
+    static void addQuad(List<Vector3> vertices, Dictionary<Vector4, int> vertexDictionary, int direction, List<int> triangles, List<Vector3> normals, List<Vector2> uv,
+    float x0, float y0, float z0,  // start position
+    float x1, float y1, float z1,  // up vector
+    float x2, float y2, float z2,  // right vector
+    Vector2 minUV, Vector2 maxUV) { //for uv coordinates
+
+        //TODO ONLY reuse vertices if they look in the same direction.
+        //DONE Direction is needed to make sure that only same facing faces are connected
+
+        // calculating the position of the new vertices in the list
+        //int pos = vertices.Count;
+        //int pos1 = pos + 1;
+        //int pos2 = pos1 + 1;
+        //int pos3 = pos2 + 1;
+
+        int pos, pos1, pos2, pos3;
+
+        //
+        int vertCount = vertices.Count;
+
+        // constructing normals
+        float normX, normY, normZ;
+        VectorProduct(x1, y1, z1,
+            x2, y2, z2,
+            out normX, out normY, out normZ);
+
+        Vector3 normal = new Vector3(normX, normY, normZ);
+
+
+        Vector3 firstVec = new Vector3(x0, y0, z0);
+        Vector4 firstPos = new Vector4(x0, y0, z0, direction);
+        if (!vertexDictionary.ContainsKey(firstPos)) {
+            vertices.Add(firstVec);
+            vertexDictionary.Add(firstPos, vertCount++);
+            Vector2 uv1 = new Vector2((firstPos.x + minUV.x) / maxUV.x, (firstPos.z + minUV.y) / maxUV.y);
+            uv.Add(uv1);
+            normals.Add(normal);
+        }
+        pos = vertexDictionary[firstPos];
+
+        //vertices.Add(new Vector3(x0, y0, z0));
+
+        //position up
+        float upX = x0 + x1;
+        float upY = y0 + y1;
+        float upZ = z0 + z1; ;
+
+        //position right
+        float rightX = x0 + x2;
+        float rightY = y0 + y2;
+        float rightZ = z0 + z2;
+
+        //TODO Finish
+
+        //vertices.Add(new Vector3(upX, upY, upZ));
+        Vector3 secondVec = new Vector3(upX, upY, upZ);
+        Vector4 secondPos = new Vector4(upX, upY, upZ, direction);
+        if (!vertexDictionary.ContainsKey(secondPos)) {
+            vertices.Add(secondVec);
+            vertexDictionary.Add(secondPos, vertCount++);
+            normals.Add(normal);
+            Vector2 uv2 = new Vector2((secondPos.x + minUV.x) / maxUV.x, (secondPos.z + minUV.y) / maxUV.y);
+            uv.Add(uv2);
+        }
+        pos1 = vertexDictionary[secondPos];
+
+        //vertices.Add(new Vector3(upX + x2, upY + y2, upZ + z2));
+        Vector3 thirdVec = new Vector3(upX + x2, upY + y2, upZ + z2);
+        Vector4 thirdPos = new Vector4(upX + x2, upY + y2, upZ + z2, direction);
+        if (!vertexDictionary.ContainsKey(thirdPos)) {
+            vertices.Add(thirdVec);
+            vertexDictionary.Add(thirdPos, vertCount++);
+            normals.Add(normal);
+            Vector2 uv3 = new Vector2((thirdPos.x + minUV.x) / maxUV.x, (thirdPos.z + minUV.y) / maxUV.y);
+            uv.Add(uv3);
+        }
+        pos2 = vertexDictionary[thirdPos];
+
+        //vertices.Add(new Vector3(rightX, rightY, rightZ));
+        Vector3 forthVec = new Vector3(rightX, rightY, rightZ);
+        Vector4 forthPos = new Vector4(rightX, rightY, rightZ, direction);
+        if (!vertexDictionary.ContainsKey(forthPos)) {
+            vertices.Add(forthVec);
+            vertexDictionary.Add(forthPos, vertCount++);
+            normals.Add(normal);
+            Vector2 uv4 = new Vector2((forthPos.x + minUV.x) / maxUV.x, (forthPos.z + minUV.y) / maxUV.y);
+            uv.Add(uv4);
+        }
+        pos3 = vertexDictionary[forthPos];
+
+
+        //todo adding alternatinv uvs for uv2
+        //adding basic uv positions 
+        //uv.Add(new Vector2(0, 0));
+        //uv.Add(new Vector2(0, 1));
+        //uv.Add(new Vector2(1, 1));
+        //uv.Add(new Vector2(1, 0));
+
+        connectQuadTriangles(triangles, pos, pos1, pos2, pos3);
+    }
+
 
     //connecting the vertices of a quad to two triangles
     static void connectQuadTriangles(List<int> triangles, int pos0, int pos1, int pos2, int pos3) {
@@ -1064,6 +1392,113 @@ public static class MeshGenerator {
                 0, height, 0);
         }
     }
+
+    static void addCube(List<Vector3> vertices, Dictionary<Vector4, int> vertexDictionary, List<int> triangles, List<Vector3> normals, List<Vector2> uv, bool[] removeFace,
+    float posX, float posY, float posZ,
+    float width, float height, float depth,
+    Vector2 minUV, Vector2 maxUV) {
+
+        float halfWidth = width / 2;
+        float halfHeight = height / 2;
+        float halfDepth = depth / 2;
+
+        //front bottom left
+        float xLeft = posX - halfWidth;
+        float yBot = posY - halfHeight;
+        float zFront = posZ - halfDepth;
+
+        //back top right
+        float xRight = posX + halfWidth;
+        float yTop = posY + halfHeight;
+        float zBack = posZ + halfDepth;
+
+        if (!removeFace[0]) {
+            // starting point for front
+            float x0 = xLeft;
+            float y0 = yBot;
+            float z0 = zFront;
+
+            //adding front 0 stands fpr front
+            addQuad(vertices, vertexDictionary, 0, triangles, normals, uv,
+                x0, y0, z0,
+                0, height, 0,
+                width, 0, 0,
+                minUV, maxUV);
+        }
+
+        if (!removeFace[1]) {
+            // starting point for back
+            float x4 = xRight;
+            float y4 = yBot;
+            float z4 = zBack;
+
+            //adding back 1 stands for back
+            addQuad(vertices, vertexDictionary, 1, triangles, normals, uv,
+                x4, y4, z4,
+                0, height, 0,
+                -width, 0, 0,
+                minUV, maxUV);
+        }
+
+        if (!removeFace[2]) {
+            // starting point for top
+            float x1 = xLeft;
+            float y1 = yTop;
+            float z1 = zFront;
+
+            // adding top 2 stands for top
+            addQuad(vertices, vertexDictionary, 2, triangles, normals, uv,
+                x1, y1, z1,
+                0, 0, depth,
+                width, 0, 0,
+                minUV, maxUV);
+        }
+
+        if (!removeFace[3]) {
+            // starting point for right
+            float x2 = xRight;
+            float y2 = yTop;
+            float z2 = zFront;
+
+
+            //adding right 3 stands for right
+            addQuad(vertices, vertexDictionary, 3, triangles, normals, uv,
+                x2, y2, z2,
+                0, 0, depth,
+                0, -height, 0,
+                minUV, maxUV);
+        }
+
+        if (!removeFace[4]) {
+            // starting point for bot 4 stands for bot
+            float x3 = xRight;
+            float y3 = yBot;
+            float z3 = zFront;
+
+            //adding bot
+            addQuad(vertices, vertexDictionary, 4, triangles, normals, uv,
+                x3, y3, z3,
+                0, 0, depth,
+                -width, 0, 0,
+                minUV, maxUV);
+        }
+
+        if (!removeFace[5]) {
+
+            //starting point for left
+            float x5 = xLeft;
+            float y5 = yBot;
+            float z5 = zFront;
+
+            //adding left 5 stands for left
+            addQuad(vertices, vertexDictionary, 5, triangles, normals, uv,
+                x5, y5, z5,
+                0, 0, depth,
+                0, height, 0,
+                minUV, maxUV);
+        }
+    }
+
 
     static void addCube(List<Vector3> vertices, List<int> triangles, List<Vector3> normals, List<Vector2> uv, List<Color> colors, Color color, bool[] removeFace,
         float posX, float posY, float posZ,
@@ -1388,6 +1823,229 @@ public static class MeshGenerator {
         return returnValue;
     }
 
+    // simple version adding vertixes always on the same space.
+    static int addMarchingCubeOptimizedSmooth(List<Vector3> vertices, List<int> triangles, Dictionary<Vector3, int> vertexDictionary,
+        float midX, float midY, float midZ,
+        float width, float height, float depth,
+        bool in0, bool in1, bool in2, bool in3,
+        bool in4, bool in5, bool in6, bool in7) {
+
+        // Code from Sebastian Lague
+        // Calculate unique index for each cube configuration.
+        // There are 256 possible values
+        // A value of 0 means cube is entirely inside surface; 255 entirely outside.
+        // The value is used to look up the edge table, which indicates which edges of the cube are cut.
+        int cubeIndex = 0;
+        if (in0) cubeIndex |= 1; // if(in0) cubeIndex+=1;
+        if (in1) cubeIndex |= 2;
+        if (in2) cubeIndex |= 4;
+        if (in3) cubeIndex |= 8;
+        if (in4) cubeIndex |= 16;
+        if (in5) cubeIndex |= 32;
+        if (in6) cubeIndex |= 64;
+        if (in7) cubeIndex |= 128;
+
+        //Generating additional data, will only do something if not already initialized.
+        //Should be called in the method calling this method!
+        //MarchingCubesHelper.GenerateAdvancedData();
+
+        //if no vertices are needed do nothing
+
+        int tricount = MarchingCubesHelper.triangleCounts[cubeIndex];
+
+        if (tricount == 0) {
+            return 0;
+        }
+
+        int vertCount = vertices.Count;
+
+        float halfWidth = width / 2;
+        float halfHeight = height / 2;
+        float halfDepth = depth / 2;
+
+        //front bottom left
+        float xLeft = midX - halfWidth;
+        float yBot = midY - halfHeight;
+        float zFront = midZ - halfDepth;
+
+        //back top right
+        float xRight = midX + halfWidth;
+        float yTop = midY + halfHeight;
+        float zBack = midZ + halfDepth;
+
+        int returnValue = 0;
+
+        List<int> correctVertexIndex = new List<int>();
+
+        Vector3 vert;
+
+        int pos = vertCount;
+
+        //We add now only the vertices which are needed.
+
+        //bottom square
+        if (MarchingCubesHelper.vertexNeeded[cubeIndex, 0]) {
+            vert = new Vector3(xLeft, yBot, midZ);
+            if (!vertexDictionary.ContainsKey(vert)) {
+                vertexDictionary.Add(vert, pos);
+                pos++;
+                vertices.Add(vert);
+                //vertices.Add(new Vector3(xLeft, yBot, midZ));
+                returnValue++;
+            }
+            correctVertexIndex.Add(vertexDictionary[vert]);
+        }
+        if (MarchingCubesHelper.vertexNeeded[cubeIndex, 1]) {
+            //vertices.Add(new Vector3(midX, yBot, zBack));
+            vert = new Vector3(midX, yBot, zBack);
+            if (!vertexDictionary.ContainsKey(vert)) {
+                vertexDictionary.Add(vert, pos);
+                pos++;
+                vertices.Add(vert);
+                //vertices.Add(new Vector3(xLeft, yBot, midZ));
+                returnValue++;
+            }
+            correctVertexIndex.Add(vertexDictionary[vert]);
+        }
+        if (MarchingCubesHelper.vertexNeeded[cubeIndex, 2]) {
+            //vertices.Add(new Vector3(xRight, yBot, midZ));
+            vert = new Vector3(xRight, yBot, midZ);
+            if (!vertexDictionary.ContainsKey(vert)) {
+                vertexDictionary.Add(vert, pos);
+                pos++;
+                vertices.Add(vert);
+                //vertices.Add(new Vector3(xLeft, yBot, midZ));
+                returnValue++;
+            }
+            correctVertexIndex.Add(vertexDictionary[vert]);
+        }
+        if (MarchingCubesHelper.vertexNeeded[cubeIndex, 3]) {
+            //vertices.Add(new Vector3(midX, yBot, zFront));
+            vert = new Vector3(midX, yBot, zFront);
+            if (!vertexDictionary.ContainsKey(vert)) {
+                vertexDictionary.Add(vert, pos);
+                pos++;
+                vertices.Add(vert);
+                //vertices.Add(new Vector3(xLeft, yBot, midZ));
+                returnValue++;
+            }
+            correctVertexIndex.Add(vertexDictionary[vert]);
+        }
+
+
+        //top square
+        if (MarchingCubesHelper.vertexNeeded[cubeIndex, 4]) {
+            //vertices.Add(new Vector3(xLeft, yTop, midZ));
+            vert = new Vector3(xLeft, yTop, midZ);
+            if (!vertexDictionary.ContainsKey(vert)) {
+                vertexDictionary.Add(vert, pos);
+                pos++;
+                vertices.Add(vert);
+                //vertices.Add(new Vector3(xLeft, yBot, midZ));
+                returnValue++;
+            }
+            correctVertexIndex.Add(vertexDictionary[vert]);
+        }
+        if (MarchingCubesHelper.vertexNeeded[cubeIndex, 5]) {
+            //vertices.Add(new Vector3(midX, yTop, zBack));
+            vert = new Vector3(midX, yTop, zBack);
+            if (!vertexDictionary.ContainsKey(vert)) {
+                vertexDictionary.Add(vert, pos);
+                pos++;
+                vertices.Add(vert);
+                //vertices.Add(new Vector3(xLeft, yBot, midZ));
+                returnValue++;
+            }
+            correctVertexIndex.Add(vertexDictionary[vert]);
+        }
+        if (MarchingCubesHelper.vertexNeeded[cubeIndex, 6]) {
+            //vertices.Add(new Vector3(xRight, yTop, midZ));
+            vert = new Vector3(xRight, yTop, midZ);
+            if (!vertexDictionary.ContainsKey(vert)) {
+                vertexDictionary.Add(vert, pos);
+                pos++;
+                vertices.Add(vert);
+                //vertices.Add(new Vector3(xLeft, yBot, midZ));
+                returnValue++;
+            }
+            correctVertexIndex.Add(vertexDictionary[vert]);
+        }
+        if (MarchingCubesHelper.vertexNeeded[cubeIndex, 7]) {
+            //vertices.Add(new Vector3(midX, yTop, zFront));
+            vert = new Vector3(midX, yTop, zFront);
+            if (!vertexDictionary.ContainsKey(vert)) {
+                vertexDictionary.Add(vert, pos);
+                pos++;
+                vertices.Add(vert);
+                //vertices.Add(new Vector3(xLeft, yBot, midZ));
+                returnValue++;
+            }
+            correctVertexIndex.Add(vertexDictionary[vert]);
+        }
+
+
+        //middle square
+        if (MarchingCubesHelper.vertexNeeded[cubeIndex, 8]) {
+            //vertices.Add(new Vector3(xLeft, midY, zFront));
+            vert = new Vector3(xLeft, midY, zFront);
+            if (!vertexDictionary.ContainsKey(vert)) {
+                vertexDictionary.Add(vert, pos);
+                pos++;
+                vertices.Add(vert);
+                //vertices.Add(new Vector3(xLeft, yBot, midZ));
+                returnValue++;
+            }
+            correctVertexIndex.Add(vertexDictionary[vert]);
+        }
+        if (MarchingCubesHelper.vertexNeeded[cubeIndex, 9]) {
+            //vertices.Add(new Vector3(xLeft, midY, zBack));
+            vert = new Vector3(xLeft, midY, zBack);
+            if (!vertexDictionary.ContainsKey(vert)) {
+                vertexDictionary.Add(vert, pos);
+                pos++;
+                vertices.Add(vert);
+                //vertices.Add(new Vector3(xLeft, yBot, midZ));
+                returnValue++;
+            }
+            correctVertexIndex.Add(vertexDictionary[vert]);
+        }
+        if (MarchingCubesHelper.vertexNeeded[cubeIndex, 10]) {
+            //vertices.Add(new Vector3(xRight, midY, zBack));
+            vert = new Vector3(xRight, midY, zBack);
+            if (!vertexDictionary.ContainsKey(vert)) {
+                vertexDictionary.Add(vert, pos);
+                pos++;
+                vertices.Add(vert);
+                //vertices.Add(new Vector3(xLeft, yBot, midZ));
+                returnValue++;
+            }
+            correctVertexIndex.Add(vertexDictionary[vert]);
+        }
+        if (MarchingCubesHelper.vertexNeeded[cubeIndex, 11]) {
+            //vertices.Add(new Vector3(xRight, midY, zFront));
+            vert = new Vector3(xRight, midY, zFront);
+            if (!vertexDictionary.ContainsKey(vert)) {
+                vertexDictionary.Add(vert, pos);
+                pos++;
+                vertices.Add(vert);
+                //vertices.Add(new Vector3(xLeft, yBot, midZ));
+                returnValue++;
+            }
+            correctVertexIndex.Add(vertexDictionary[vert]);
+        }
+
+        //always only the triangles needed
+
+
+        // adding triangles backwards, since somehow they are reverse looking
+        for (int i = tricount - 1; i >= 0; i--) {
+            //triangles.Add(vertCount + MarchingCubesHelper.actualVertexNumber[cubeIndex, i]);
+            triangles.Add(correctVertexIndex[MarchingCubesHelper.actualVertexNumber[cubeIndex, i]]);
+        }
+
+        return returnValue;
+    }
+
 
 
     static int addMarchingCubeOptimized(List<Vector3> vertices, List<int> triangles, List<Color> colors,
@@ -1571,6 +2229,282 @@ public static class MeshGenerator {
         // adding triangles backwards, since somehow they are reverse looking
         for (int i = tricount - 1; i >= 0; i--) {
             triangles.Add(vertCount + MarchingCubesHelper.actualVertexNumber[cubeIndex, i]);
+        }
+
+        return returnValue;
+    }
+
+
+    static int addMarchingCubeOptimizedSmooth(List<Vector3> vertices, List<int> triangles, Dictionary<Vector3, int> vertexDictionary, List<Color> colors,
+    float midX, float midY, float midZ,
+    float width, float height, float depth, Color color, float threshold,
+    bool in0, bool in1, bool in2, bool in3,
+    bool in4, bool in5, bool in6, bool in7,
+    float val0, float val1, float val2, float val3,
+    float val4, float val5, float val6, float val7) {
+
+
+        // Code from Sebastian Lague
+        // Calculate unique index for each cube configuration.
+        // There are 256 possible values
+        // A value of 0 means cube is entirely inside surface; 255 entirely outside.
+        // The value is used to look up the edge table, which indicates which edges of the cube are cut.
+        int cubeIndex = 0;
+        if (in0) cubeIndex |= 1;
+        if (in1) cubeIndex |= 2;
+        if (in2) cubeIndex |= 4;
+        if (in3) cubeIndex |= 8;
+        if (in4) cubeIndex |= 16;
+        if (in5) cubeIndex |= 32;
+        if (in6) cubeIndex |= 64;
+        if (in7) cubeIndex |= 128;
+
+        //Generating additional data, will only do something if not already initialized.
+        //Should be called in the method calling this method!
+        //MarchingCubesHelper.GenerateAdvancedData();
+
+        //if no vertices are needed do nothing
+
+        int tricount = MarchingCubesHelper.triangleCounts[cubeIndex];
+
+        if (tricount == 0) {
+            return 0;
+        }
+
+        int returnValue = 0;
+
+        int vertCount = vertices.Count;
+
+        float halfWidth = width / 2;
+        float halfHeight = height / 2;
+        float halfDepth = depth / 2;
+
+        //front bottom left
+        float xLeft = midX - halfWidth;
+        float yBot = midY - halfHeight;
+        float zFront = midZ - halfDepth;
+
+        //back top right
+        float xRight = midX + halfWidth;
+        float yTop = midY + halfHeight;
+        float zBack = midZ + halfDepth;
+
+        //Currently all vertices same color
+
+        float posX = 0;
+        float posY = 0;
+        float posZ = 0;
+
+        Vector3 vert;
+        int pos = vertices.Count;
+
+        List<int> vertexPositions = new List<int>();
+
+        //bottom square starting left in clockwise direction
+        if (MarchingCubesHelper.vertexNeeded[cubeIndex, 0]) {
+            InterpolateVector(xLeft, yBot, zFront,
+    xLeft, yBot, zBack,
+    val0, val1, threshold,
+    out posX, out posY, out posZ);
+
+            vert = new Vector3(posX, posY, posZ);
+            if (!vertexDictionary.ContainsKey(vert)) {
+                vertexDictionary.Add(vert, pos++);
+                vertices.Add(vert);
+                colors.Add(color);
+                returnValue++;
+            }
+            vertexPositions.Add(vertexDictionary[vert]);
+        }
+        if (MarchingCubesHelper.vertexNeeded[cubeIndex, 1]) {
+            //colors.Add(color);
+            InterpolateVector(xLeft, yBot, zBack,
+    xRight, yBot, zBack,
+    val1, val2, threshold,
+    out posX, out posY, out posZ);
+
+            vert = new Vector3(posX, posY, posZ);
+            if (!vertexDictionary.ContainsKey(vert)) {
+                vertexDictionary.Add(vert, pos++);
+                vertices.Add(vert);
+                colors.Add(color);
+                returnValue++;
+            }
+            vertexPositions.Add(vertexDictionary[vert]);
+        }
+        if (MarchingCubesHelper.vertexNeeded[cubeIndex, 2]) {
+            //colors.Add(color);
+            InterpolateVector(xRight, yBot, zBack,
+    xRight, yBot, zFront,
+    val2, val3, threshold,
+    out posX, out posY, out posZ);
+
+            vert = new Vector3(posX, posY, posZ);
+            if (!vertexDictionary.ContainsKey(vert)) {
+                vertexDictionary.Add(vert, pos++);
+                vertices.Add(vert);
+                colors.Add(color);
+                returnValue++;
+            }
+            vertexPositions.Add(vertexDictionary[vert]);
+        }
+        if (MarchingCubesHelper.vertexNeeded[cubeIndex, 3]) {
+            ///colors.Add(color);
+            InterpolateVector(xRight, yBot, zFront,
+    xLeft, yBot, zFront,
+    val3, val0, threshold,
+    out posX, out posY, out posZ);
+
+            vert = new Vector3(posX, posY, posZ);
+            if (!vertexDictionary.ContainsKey(vert)) {
+                vertexDictionary.Add(vert, pos++);
+                vertices.Add(vert);
+                colors.Add(color);
+                returnValue++;
+            }
+            vertexPositions.Add(vertexDictionary[vert]);
+        }
+
+
+        //top squaresquare starting left in clockwise direction
+        if (MarchingCubesHelper.vertexNeeded[cubeIndex, 4]) {
+            //colors.Add(color);
+            InterpolateVector(xLeft, yTop, zFront,
+    xLeft, yTop, zBack,
+    val4, val5, threshold,
+    out posX, out posY, out posZ);
+
+            vert = new Vector3(posX, posY, posZ);
+            if (!vertexDictionary.ContainsKey(vert)) {
+                vertexDictionary.Add(vert, pos++);
+                vertices.Add(vert);
+                colors.Add(color);
+                returnValue++;
+            }
+            vertexPositions.Add(vertexDictionary[vert]);
+        }
+        if (MarchingCubesHelper.vertexNeeded[cubeIndex, 5]) {
+            //colors.Add(color);
+            InterpolateVector(xLeft, yTop, zBack,
+    xRight, yTop, zBack,
+    val5, val6, threshold,
+    out posX, out posY, out posZ);
+
+            vert = new Vector3(posX, posY, posZ);
+            if (!vertexDictionary.ContainsKey(vert)) {
+                vertexDictionary.Add(vert, pos++);
+                vertices.Add(vert);
+                colors.Add(color);
+                returnValue++;
+            }
+            vertexPositions.Add(vertexDictionary[vert]);
+        }
+        if (MarchingCubesHelper.vertexNeeded[cubeIndex, 6]) {
+            //colors.Add(color);
+            InterpolateVector(xRight, yTop, zBack,
+    xRight, yTop, zFront,
+    val6, val7, threshold,
+    out posX, out posY, out posZ);
+
+            vert = new Vector3(posX, posY, posZ);
+            if (!vertexDictionary.ContainsKey(vert)) {
+                vertexDictionary.Add(vert, pos++);
+                vertices.Add(vert);
+                colors.Add(color);
+                returnValue++;
+            }
+            vertexPositions.Add(vertexDictionary[vert]);
+        }
+        if (MarchingCubesHelper.vertexNeeded[cubeIndex, 7]) {
+            //colors.Add(color);
+            InterpolateVector(xRight, yTop, zFront,
+    xLeft, yTop, zFront,
+    val7, val4, threshold,
+    out posX, out posY, out posZ);
+
+            vert = new Vector3(posX, posY, posZ);
+            if (!vertexDictionary.ContainsKey(vert)) {
+                vertexDictionary.Add(vert, pos++);
+                vertices.Add(vert);
+                colors.Add(color);
+                returnValue++;
+            }
+            vertexPositions.Add(vertexDictionary[vert]);
+        }
+
+
+        //middle square starting front left going in clockwise direction
+        if (MarchingCubesHelper.vertexNeeded[cubeIndex, 8]) {
+            //colors.Add(color);
+            InterpolateVector(xLeft, yBot, zFront,
+    xLeft, yTop, zFront,
+    val0, val4, threshold,
+    out posX, out posY, out posZ);
+
+            vert = new Vector3(posX, posY, posZ);
+            if (!vertexDictionary.ContainsKey(vert)) {
+                vertexDictionary.Add(vert, pos++);
+                vertices.Add(vert);
+                colors.Add(color);
+                returnValue++;
+            }
+            vertexPositions.Add(vertexDictionary[vert]);
+        }
+        if (MarchingCubesHelper.vertexNeeded[cubeIndex, 9]) {
+            //colors.Add(color);
+            InterpolateVector(xLeft, yBot, zBack,
+    xLeft, yTop, zBack,
+    val1, val5, threshold,
+    out posX, out posY, out posZ);
+
+            vert = new Vector3(posX, posY, posZ);
+            if (!vertexDictionary.ContainsKey(vert)) {
+                vertexDictionary.Add(vert, pos++);
+                vertices.Add(vert);
+                colors.Add(color);
+                returnValue++;
+            }
+            vertexPositions.Add(vertexDictionary[vert]);
+        }
+        if (MarchingCubesHelper.vertexNeeded[cubeIndex, 10]) {
+            //colors.Add(color);
+            InterpolateVector(xRight, yBot, zBack,
+    xRight, yTop, zBack,
+    val2, val6, threshold,
+    out posX, out posY, out posZ);
+
+            vert = new Vector3(posX, posY, posZ);
+            if (!vertexDictionary.ContainsKey(vert)) {
+                vertexDictionary.Add(vert, pos++);
+                vertices.Add(vert);
+                colors.Add(color);
+                returnValue++;
+            }
+            vertexPositions.Add(vertexDictionary[vert]);
+        }
+        if (MarchingCubesHelper.vertexNeeded[cubeIndex, 11]) {
+            //colors.Add(color);
+            InterpolateVector(xRight, yBot, zFront,
+    xRight, yTop, zFront,
+    val3, val7, threshold,
+    out posX, out posY, out posZ);
+
+            vert = new Vector3(posX, posY, posZ);
+            if (!vertexDictionary.ContainsKey(vert)) {
+                vertexDictionary.Add(vert, pos++);
+                vertices.Add(vert);
+                colors.Add(color);
+                returnValue++;
+            }
+            vertexPositions.Add(vertexDictionary[vert]);
+        }
+
+        //always only the triangles needed
+
+        // adding triangles backwards, since somehow they are reverse looking
+        for (int i = tricount - 1; i >= 0; i--) {
+            //triangles.Add(vertCount + MarchingCubesHelper.actualVertexNumber[cubeIndex, i]);
+            triangles.Add(vertexPositions[MarchingCubesHelper.actualVertexNumber[cubeIndex, i]]);
         }
 
         return returnValue;

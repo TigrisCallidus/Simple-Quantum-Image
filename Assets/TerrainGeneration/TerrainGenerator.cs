@@ -253,6 +253,15 @@ public class TerrainGenerator : MonoBehaviour {
             case VisualitationType.MarshingCubesAdvanced:
                 GeneratedMesh = GenerateMarshingCubesAdvanced(Data3D, Threshold, maxheight, AlwaysDrawBottomCube);
                 break;
+            case VisualitationType.SmoothNoise3D:
+                GeneratedMesh = Generate3DNoiseSmooth(Data3D, Threshold, AlwaysDrawBottomCube);
+                break;
+            case VisualitationType.SmoothMarshingCubes:
+                GeneratedMesh = GenerateMarshingCubesSmooth(Data3D, Threshold, maxheight, AlwaysDrawBottomCube);
+                break;
+            case VisualitationType.SmoothMarshingCubesAdvanced:
+                GeneratedMesh = GenerateMarshingCubesAdvancedSmooth(Data3D, Threshold, maxheight, AlwaysDrawBottomCube);
+                break;
             default:
                 break;
         }
@@ -369,6 +378,81 @@ public class TerrainGenerator : MonoBehaviour {
         return returnvalue;
     }
 
+
+    /// <summary>
+    /// Generating a mesh interpreting the 3D data as noise and generating cubes in a 3D grid if the noise is over the threshold
+    /// Smoothens the mesh by reusing vertices
+    /// </summary>
+    /// <param name="data3D">The 3D data representation of the image (or of anything else if you want).</param>
+    /// <param name="threshold">Value between 0 and 1. A good value here is normally 0.5 Different values can be appropriate for different (non image) data.</param>
+    /// <param name="alwaysDrawBottomCube">With this parameter set the lowest place of cubes is always drawn. Making sure there are no "holes"</param>
+    /// <returns></returns>
+    public static Mesh Generate3DNoiseSmooth(Data3D data3D, float threshold, bool alwaysDrawBottomCube = true) {
+        Vector3 StartPos = new Vector3(-0.5f * data3D.X + 0.5f, 0.5f, -0.5f * data3D.Y + 0.5f);
+        if (alwaysDrawBottomCube) {
+            StartPos = new Vector3(-0.5f * data3D.X + 0.5f, -0.5f, -0.5f * data3D.Y + 0.5f);
+        }
+        Vector3 spawnPosition;
+
+        // move this much
+        Vector2 minUV = new Vector2(0.5f * data3D.X, 0.5f * data3D.Y);
+        //divide by this much
+        Vector2 maxUV = new Vector2( data3D.X + 1,  data3D.Y + 1);
+
+
+
+        List<Vector3> positions = new List<Vector3>();
+        List<bool[]> ignoreFace = new List<bool[]>();
+        List<Vector2> uv = new List<Vector2>();
+
+        float scaleX = 1.0f / data3D.X;
+        float scaleY = 1.0f / data3D.Y;
+        float scaleZ = 1.0f / data3D.Z;
+
+        for (int i = 0; i < data3D.X; i++) {
+            for (int j = 0; j < data3D.Y; j++) {
+                for (int k = 0; k < data3D.Z; k++) {
+
+
+                    if (data3D[i, j, k].Value > threshold) {
+                        spawnPosition = StartPos + new Vector3(i, k, j);
+                        positions.Add(spawnPosition);
+                        bool[] ignore = new bool[6] {
+                            j>0 && data3D[i,j-1,k].Value>threshold,
+                            j<data3D.Y-1 && data3D[i,j+1,k].Value>threshold,
+                            k<data3D.Z-1 && data3D[i,j,k+1].Value>threshold,
+                            i<data3D.X-1 && data3D[i+1,j,k].Value>threshold,
+                            (k==0) || data3D[i,j,k-1].Value>threshold,
+                            i>0 && data3D[i-1,j,k].Value>threshold,
+
+                        };
+
+                        ignoreFace.Add(ignore);
+                        /*
+                        int siteCount = 0;
+                        for (int count2 = 0; count2 < 6; count2++) {
+                            if (!ignore[count2]) {
+                                siteCount++;
+                            }
+                        }
+                        int endcount = siteCount * 4;
+                        //Todo make option for flowing colors
+                        for (int count = 0; count < endcount; count++) {
+                            Vector2 position = new Vector2(scaleX * i, scaleY * j);
+                            uv.Add(position);
+                        }
+                        */
+                    }
+                }
+            }
+        }
+        Mesh returnvalue = MeshGenerator.GetCubesSmooth(positions, ignoreFace, Vector3.one, minUV, maxUV);
+        //returnvalue.uv = uv.ToArray();
+        return returnvalue;
+    }
+
+
+
     /// <summary>
     /// Generates a Terrain (deformed plane) according to the 2D data
     /// </summary>
@@ -411,6 +495,45 @@ public class TerrainGenerator : MonoBehaviour {
         }
         return MeshGenerator.ConstructMarchingCubesYZSwitched(data3D, new Vector3(0, starty, 0), Color.white, threshold);
     }
+
+
+
+
+
+    /// <summary>
+    /// Generate a SMOOTH mesh using a (simple) Marching Cubes algorithm. 
+    /// </summary>
+    /// <param name="data3D">The 3D data representation of the image (or of anything else if you want).</param>
+    /// <param name="threshold">Value between 0 and 1. A good value here is normally 0.5 Different values will create (in average) more steap or less cheap angles.</param>
+    /// <param name="maxHeight">The maximum height the mesh will have</param>
+    /// <param name="alwaysDrawBottomCube">With this parameter set the lowest place of cubes is always drawn. Making sure there are no "holes"</param>
+    /// <returns>Returns a mesh being made with marching cubes representing the image.</returns>
+    public static Mesh GenerateMarshingCubesSmooth(Data3D data3D, float threshold, float maxHeight, bool alwaysDrawBottomCube = true) {
+        float starty = 0.5f * maxHeight + 1;
+        if (alwaysDrawBottomCube) {
+            starty = starty - 0.5f;
+        }
+        return MeshGenerator.ConstructMarchingCubesYZSwitchedSmooth(data3D, new Vector3(0, starty, 0), threshold);
+    }
+
+
+    /// <summary>
+    /// Generate a SMOOTH mesh using an advanced Marching Cubes algorithm, allowing for different angels.
+    /// </summary>
+    /// <param name="data3D">The 3D data representation of the image (or of anything else if you want).</param>
+    /// <param name="threshold">Value between 0 and 1. A good value here is normally 0.5 Different values will create (in average) more steap or less cheap angles.</param>
+    /// <param name="maxHeight">The maximum height the mesh will have</param>
+    /// <param name="alwaysDrawBottomCube">With this parameter set the lowest place of cubes is always drawn. Making sure there are no "holes"</param>
+    /// <returns>Returns a mesh being made with the advanced marching cubes representing the image.</returns>
+
+    public static Mesh GenerateMarshingCubesAdvancedSmooth(Data3D data3D, float threshold, float maxHeight, bool alwaysDrawBottomCube = true) {
+        float starty = 0.5f * maxHeight + 1;
+        if (alwaysDrawBottomCube) {
+            starty = starty - 0.5f;
+        }
+        return MeshGenerator.ConstructMarchingCubesYZSwitchedSmooth(data3D, new Vector3(0, starty, 0), Color.white, threshold);
+    }
+
 
     /// <summary>
     /// Generates a save path for the mesh to be saved to. Is used since creating assets is only allowed in editor scripts.
@@ -646,7 +769,10 @@ public class TerrainGenerator : MonoBehaviour {
         Noise3D,
         Terrain,
         MarshingCubes,
-        MarshingCubesAdvanced
+        MarshingCubesAdvanced,
+        SmoothNoise3D,
+        SmoothMarshingCubes,
+        SmoothMarshingCubesAdvanced
     }
 
     public enum MaterialType {
