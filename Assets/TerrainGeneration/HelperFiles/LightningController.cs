@@ -46,6 +46,13 @@ public class LightningController : MonoBehaviour {
         }
     }
 
+    public void SetLayer(int layerMask) {
+        MainLight.cullingMask = layerMask;
+        Spotlight1.cullingMask = layerMask;
+        Spotlight2.cullingMask = layerMask;
+        Spotlight3.cullingMask = layerMask;
+    }
+    
     public enum AmbientMode {
         Skybox,
         SingleColor,

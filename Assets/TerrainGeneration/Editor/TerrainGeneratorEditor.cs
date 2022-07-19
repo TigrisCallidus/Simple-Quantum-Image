@@ -21,6 +21,9 @@ public class TerrainGeneratorEditor : Editor {
 
     TerrainGenerator targetScript;
 
+    SerializedProperty objectNumber;
+
+
     SerializedProperty fileName;
     SerializedProperty generatedMesh;
     SerializedProperty usedProfile;
@@ -34,6 +37,7 @@ public class TerrainGeneratorEditor : Editor {
         generatedMesh = serializedObject.FindProperty("GeneratedMesh");
         usedProfile = serializedObject.FindProperty("UsedProfile");
         jsonFileName = serializedObject.FindProperty("JsonFileName");
+        objectNumber = serializedObject.FindProperty("ObjectNumber");
     }
 
     public override void OnInspectorGUI() {
@@ -64,6 +68,24 @@ public class TerrainGeneratorEditor : Editor {
         }
 
         */
+        /*
+
+        if (targetScript.TextureForTransparency!=null) {
+            if (GUILayout.Button("Add Transparency")) {
+                targetScript.ApplyTransparency();
+            }
+        }
+
+        */
+        
+
+        if (targetScript.TextureForCut != null) {
+            if (GUILayout.Button("Apply Cut")) {
+                targetScript.ApplyCut();
+            }
+        }
+
+
 
         if (GUILayout.Button("Generate a terrain with the chosen visualisation method")) {
             targetScript.GenerateMesh();
@@ -73,10 +95,39 @@ public class TerrainGeneratorEditor : Editor {
             targetScript.ColorMesh();
         }
 
+
+
         GUILayout.BeginHorizontal();
+        GUILayout.Label("Prepare A Merge", GUILayout.Width(145));
+        targetScript.prepareMerge = EditorGUILayout.Toggle(targetScript.prepareMerge);
+        GUILayout.EndHorizontal();
+
+        if (targetScript.prepareMerge) {
+            if (GUILayout.Button("Reset View")) {
+                targetScript.ResetView();
+            }
+
+            EditorGUILayout.PropertyField(objectNumber, new GUIContent("ObjectNumber : "));
+
+
+            if (GUILayout.Button("Prepare Merge")) {
+                targetScript.PrepareMerge();
+            }
+
+           
+        }
+
+
+            
+
+
+
+            GUILayout.BeginHorizontal();
         GUILayout.Label("Show Advanced Setting", GUILayout.Width(145));
         targetScript.showAdvanced = EditorGUILayout.Toggle(targetScript.showAdvanced);
         GUILayout.EndHorizontal();
+
+
 
         if (targetScript.showAdvanced) {
 
@@ -120,9 +171,20 @@ public class TerrainGeneratorEditor : Editor {
                 targetScript.ImportSettingsFile();
             }
 
-            // Apply changes to the serializedProperty - always do this in the end of OnInspectorGUI.
-            serializedObject.ApplyModifiedProperties();
+            if (GUILayout.Button("Import settings from json")) {
+                targetScript.ImportSettingsFile();
+            }
+
+            if (GUILayout.Button("PrepareNewMaterial")) {
+                targetScript.PrepareNewMaterial();
+            }
+
+
         }
+
+        // Apply changes to the serializedProperty - always do this in the end of OnInspectorGUI.
+        serializedObject.ApplyModifiedProperties();
+
 
     }
 }

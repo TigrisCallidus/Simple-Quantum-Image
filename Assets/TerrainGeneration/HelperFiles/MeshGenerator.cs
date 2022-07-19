@@ -880,7 +880,7 @@ public static class MeshGenerator {
     /// <param name="length">The width of 1 tile of the grid. </param>
     /// <returns>Returns a mesh containing the noise as height.</returns>
     /// This function does construct the grid directly, and therefore needs no list like the other functions above
-    public static Mesh ConstructGrid(DataGrid data, float heightScaling = 500, float width = 1, float length = 1) {
+    public static Mesh ConstructGrid(DataGrid data, float heightScaling = 500, float width = 1, float length = 1, bool removeBottom=false) {
         Mesh returnValue = new Mesh();
         returnValue.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
         returnValue.name = "ContructedGrid";
@@ -923,7 +923,9 @@ public static class MeshGenerator {
                 uv[count] = new Vector2(uvX, uvY);
                 uv2[count] = new Vector2(i % 2, j % 2);
 
-                if (i > 0 && j > 0) {
+                if (i > 0 && j > 0 && (!removeBottom || 
+                    Mathf.Abs( data[i, j].Value) > 1.0f/255 || Mathf.Abs(data[i-1, j].Value) > 1.0f / 255 ||
+                    Mathf.Abs(data[i, j-1].Value) > 1.0f / 255 || Mathf.Abs(data[i-1, j-1].Value) > 1.0f / 255)) {
                     //Except for the first row and column (ince they have no neighbours on the left or bottom), whenever a new vertex is placed, 
                     //we connect it with its left bottom, left and bottom neighbour to form 2 triangles.
                     connectQuadTriangles(triangles, ref triCount, count - 1 - dimY, count - dimY, count, count - 1);
