@@ -921,6 +921,7 @@ public static class MeshGenerator {
                 vertices[count] = new Vector3(posX, data[i, j].Value * heightScaling, posY);
                 //Setting here uv2 to repeating 0,1 and uv to go from 0 to 1 over the whole mesh
                 uv[count] = new Vector2(uvX, uvY);
+                //Debug.Log(uv[count]);
                 uv2[count] = new Vector2(i % 2, j % 2);
 
                 if (i > 0 && j > 0 && (!removeBottom || 

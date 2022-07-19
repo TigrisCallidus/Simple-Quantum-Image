@@ -687,7 +687,7 @@ public class TerrainGenerator : MonoBehaviour {
 
     public void PrepareMerge() {
         int multiplicator = 256; //2^8
-        //Lightning.transform.parent = this.transform;
+        Lightning.transform.parent = this.transform;
         int layer= (int)Mathf.Pow(2,(int)ObjectNumber);
         layer = layer * multiplicator;
         this.gameObject.layer = (int)ObjectNumber+8;

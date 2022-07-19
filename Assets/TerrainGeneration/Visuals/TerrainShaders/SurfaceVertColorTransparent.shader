@@ -5,7 +5,7 @@
     {
         _Glossiness ("Smoothness", Range(0,1)) = 0.5
         _Metallic ("Metallic", Range(0,1)) = 0.0
-        _AlphaTex("Transparent Tex (Greyscale)", 2D) = "white" {}
+        _MainTex("Transparent Tex (Greyscale)", 2D) = "white" {}
 
     }
     SubShader
@@ -22,7 +22,7 @@
         #pragma target 3.0
 
 
-        sampler2D _AlphaTex;
+        sampler2D _MainTex;
 
         struct Input
         {
@@ -43,7 +43,7 @@
         void surf (Input IN, inout SurfaceOutputStandard o)
         {
             o.Albedo = IN.color.rgb;
-            fixed4 alpha = tex2D(_AlphaTex, IN.uv_MainTex);
+            fixed4 alpha = tex2D(_MainTex, IN.uv_MainTex);
 
             // Metallic and smoothness come from slider variables
             o.Metallic = _Metallic;
