@@ -10,7 +10,6 @@
     }
     SubShader
     {
-        Cull Off
         Tags {"Queue" = "Transparent" "RenderType" = "Transparent" }
         LOD 200
 
