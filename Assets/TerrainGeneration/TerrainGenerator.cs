@@ -79,7 +79,7 @@ public class TerrainGenerator : MonoBehaviour {
 
 
     //Linking only uncomment the HideInInspector if the link is somehow lost
-    [HideInInspector]
+    //[HideInInspector]
     public MeshFilter TargetMesh;
 
     //No need to show in the editor, can be accessed from other scripts. 

@@ -85,7 +85,7 @@ public class ImageCreation : MonoBehaviour {
 
 
     private void Start() {
-        FastTeleport();
+        //FastTeleport();
     }
 
     /*

@@ -23,6 +23,8 @@ public class FirstPerson : MonoBehaviour {
 
 #endif
 
+
+    public bool Active = true;
     public float turnSpeed = 4.0f;
     public float moveSpeed = 2.0f;
 
@@ -36,13 +38,17 @@ public class FirstPerson : MonoBehaviour {
 
 #if CINEMACHINE_PRESENT
 
-        Cinemachine.enabled = false;
-
+        if (Cinemachine != null) {
+            Cinemachine.enabled = false;
+        }
 #endif
 
     }
 
     void Update() {
+        if (!Active) {
+            return;
+        }
         MouseAiming();
         KeyboardMovement();
     }
@@ -76,7 +82,9 @@ public class FirstPerson : MonoBehaviour {
 
     public void MoveCamera(Transform target) {
 #if CINEMACHINE_PRESENT
-        Cinemachine.enabled = false;
+        if (Cinemachine!=null) {
+            Cinemachine.enabled = false;
+        }
 #endif
         this.transform.position = target.transform.position;
         this.transform.rotation = target.transform.rotation;
